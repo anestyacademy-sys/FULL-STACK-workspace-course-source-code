@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosk Frontend Guide</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1d1b; --muted:#6b6a64; --border:#e3e1d9;
+  --accent:#0f766e; --accent-soft:#e0f2ef; --warn:#b45309; --warn-soft:#fdf3e2;
+  --ok:#15803d; --ok-soft:#e5f5ea; --code-bg:#161b22; --inline-bg:#efede6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121311; --surface:#1b1c1a; --text:#e9e8e3; --muted:#9d9b93; --border:#2e2f2b;
+    --accent:#2dd4bf; --accent-soft:#12302c; --warn:#fbbf24; --warn-soft:#33270f;
+    --ok:#4ade80; --ok-soft:#10291a; --code-bg:#0d1117; --inline-bg:#2a2b27;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121311; --surface:#1b1c1a; --text:#e9e8e3; --muted:#9d9b93; --border:#2e2f2b;
+  --accent:#2dd4bf; --accent-soft:#12302c; --warn:#fbbf24; --warn-soft:#33270f;
+  --ok:#4ade80; --ok-soft:#10291a; --code-bg:#0d1117; --inline-bg:#2a2b27;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1240px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px 40px;border-right:1px solid var(--border)}
+nav.toc .brand{font-weight:700;font-size:18px;margin-bottom:4px}
+nav.toc .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+nav.toc .progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px}
+nav.toc .progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+nav.toc .ptext{font-size:12px;color:var(--muted);margin-bottom:18px}
+nav.toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 6px}
+nav.toc a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--text);font-size:14px;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--accent-soft)}
+nav.toc a .n{color:var(--muted);font-variant-numeric:tabular-nums;min-width:20px;font-size:12px}
+nav.toc a.done{color:var(--muted);text-decoration:line-through}
+main{padding:40px 48px 120px;min-width:0}
+header.hero h1{font-size:38px;line-height:1.15;margin:0 0 12px}
+header.hero p{color:var(--muted);font-size:18px;max-width:720px;margin:0 0 8px}
+.theme-btn{float:right;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+h2{font-size:26px;margin:0 0 6px}
+h3{font-size:18px;margin:28px 0 8px}
+.phase{margin-top:64px;padding-top:12px;border-top:2px solid var(--text)}
+.phase-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+section.step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin:22px 0}
+.step-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;flex:none}
+.step-head .title{flex:1}
+.step-head h2{font-size:22px;margin:3px 0 0}
+label.check{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;cursor:pointer;white-space:nowrap;padding-top:6px}
+.lead{color:var(--muted);margin:4px 0 14px}
+code{font-family:"Cascadia Code",Consolas,"JetBrains Mono",monospace;font-size:.88em}
+:not(pre)>code{background:var(--inline-bg);padding:2px 6px;border-radius:5px}
+.codeblock{margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid #30363d;background:var(--code-bg)}
+.codeblock .bar{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#21262d;color:#c9d1d9;font:12px/1.4 Consolas,monospace}
+.codeblock .bar button{background:#30363d;border:0;color:#c9d1d9;border-radius:5px;padding:3px 9px;cursor:pointer;font-size:12px}
+.codeblock .bar button:hover{background:#3d444d}
+.codeblock pre{margin:0;padding:14px 16px;overflow-x:auto;color:#e6edf3}
+.codeblock pre code.hljs{padding:0;background:transparent}
+.note,.warn,.ok{border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
+.note{background:var(--accent-soft);border-left:4px solid var(--accent)}
+.warn{background:var(--warn-soft);border-left:4px solid var(--warn)}
+.ok{background:var(--ok-soft);border-left:4px solid var(--ok)}
+.note b:first-child,.warn b:first-child,.ok b:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:14px 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--inline-bg)}
+.m{font-weight:700;font-family:Consolas,monospace;font-size:12px;padding:2px 6px;border-radius:4px;color:#fff}
+.GET{background:#2563eb}.POST{background:#16a34a}.PUT{background:#d97706}.DELETE{background:#dc2626}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0}
+.flow .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;text-align:center}
+.flow .box b{display:block}
+.flow .box small{color:var(--muted)}
+.flow .arrow{color:var(--muted);font-size:20px}
+.tree{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font:14px/1.6 Consolas,monospace;white-space:pre;overflow-x:auto}
+.tree i{color:var(--muted);font-style:normal}
+ul.clean{padding-left:20px}
+ul.clean li{margin:4px 0}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;inset:0 auto 0 0;width:280px;background:var(--bg);z-index:10;transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 30px rgba(0,0,0,.25)}
+  nav.toc.open{transform:none}
+  .menu-btn{display:block;position:fixed;bottom:18px;right:18px;z-index:11;background:var(--accent);color:var(--surface);border:0;border-radius:99px;padding:12px 18px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  main{padding:24px 16px 100px}
+  header.hero h1{font-size:28px}
+  section.step{padding:18px 16px}
+  .step-head{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" id="toc">
+  <div class="brand">Kiosk frontend</div>
+  <div class="sub">React + TypeScript, step by step</div>
+  <div class="progress"><span id="bar"></span></div>
+  <div class="ptext" id="ptext">0 steps done</div>
+  <div id="toc-links"></div>
+</nav>
+
+<main>
+<button class="theme-btn" id="themeBtn">Toggle theme</button>
+<header class="hero">
+  <h1>Bring the Kiosk frontend to life, step by step</h1>
+  <p>The design template is already in your React pages: every header, card, form and footer is there as JSX and Tailwind classes. This guide covers what makes those pages <b>work</b>: TypeScript types, an API layer, routing, login, forms, image upload and live data from the backend.</p>
+  <p>Every code block comes from the real <code>frontend/src</code> folder. For the pages, the guide shows the <b>logic</b> (state, effects, handlers) and the <b>JSX lines that use it</b>. The long Tailwind classes are shortened to <code>className="…"</code> so you can see the logic.</p>
+  <p>Do the <a href="backend-guide.html">backend guide</a> first. The API must be running on <code>http://localhost:5000</code>.</p>
+</header>
+
+<!-- ===================================================== OVERVIEW -->
+<div class="phase" id="overview">
+  <div class="phase-label">Before you start</div>
+  <h2>The big picture</h2>
+</div>
+
+<h3>How the frontend is organised</h3>
+<div class="flow">
+  <div class="box"><b>Page</b><small>JSX + state</small></div><span class="arrow">→</span>
+  <div class="box"><b>Service</b><small>authService · listingService</small></div><span class="arrow">→</span>
+  <div class="box"><b>api.ts</b><small>axios + token</small></div><span class="arrow">→</span>
+  <div class="box"><b>Express API</b><small>localhost:5000</small></div><span class="arrow">→</span>
+  <div class="box"><b>MongoDB</b></div>
+</div>
+<p>Pages never call <code>axios</code> directly. They call a <b>service function</b> such as <code>listingService.getAll()</code>, which hides the URL and unwraps the response. If an endpoint changes, you fix it in one place.</p>
+
+<h3>Folder structure</h3>
+<div class="tree">frontend/
+├── index.html              <i># loads /src/main.tsx</i>
+├── vite.config.ts          <i># react + tailwind plugins</i>
+└── src/
+    ├── main.tsx            <i># mounts React inside BrowserRouter</i>
+    ├── App.tsx             <i># URL → page</i>
+    ├── index.css           <i># tailwind + design tokens (from the template)</i>
+    ├── types/
+    │   ├── Listing.ts      <i># what a listing looks like</i>
+    │   └── User.ts         <i># what a user / login answer looks like</i>
+    ├── data/
+    │   └── categories.ts   <i># the 6 categories (same as the backend)</i>
+    ├── services/
+    │   ├── api.ts          <i># axios instance + token interceptor</i>
+    │   ├── authService.ts  <i># register, login, logout, current user</i>
+    │   ├── listingService.ts <i># list, detail, mine, create, update, delete</i>
+    │   └── helpers.ts      <i># formatPrice, timeAgo, yearOf, imageUrl</i>
+    └── pages/              <i># the template screens, now wired to the API</i>
+        ├── Browse.tsx  Results.tsx  ListingDetail.tsx
+        ├── SignIn.tsx  SignUp.tsx
+        └── PostListing.tsx  Dashboard.tsx</div>
+
+<h3>Pages, URLs and what they call</h3>
+<table>
+  <tr><th>URL</th><th>Page</th><th>Login?</th><th>Calls</th></tr>
+  <tr><td><code>/</code></td><td>Browse</td><td>—</td><td><code>listingService.getAll()</code></td></tr>
+  <tr><td><code>/search?cat=&amp;q=</code></td><td>Results</td><td>—</td><td><code>listingService.getAll({ cat, q, sort })</code></td></tr>
+  <tr><td><code>/listing/:id</code></td><td>ListingDetail</td><td>—</td><td><code>getById(id)</code> + <code>getAll()</code></td></tr>
+  <tr><td><code>/signin</code></td><td>SignIn</td><td>—</td><td><code>authService.login()</code></td></tr>
+  <tr><td><code>/signup</code></td><td>SignUp</td><td>—</td><td><code>authService.register()</code></td></tr>
+  <tr><td><code>/post</code></td><td>PostListing</td><td>🔒</td><td><code>listingService.create(FormData)</code></td></tr>
+  <tr><td><code>/dashboard</code></td><td>Dashboard</td><td>🔒</td><td><code>getMine()</code> + <code>update()</code></td></tr>
+</table>
+
+<!-- ===================================================== PHASE 1 -->
+<div class="phase" id="phase1">
+  <div class="phase-label">Phase 1</div>
+  <h2>Setup</h2>
+</div>
+
+<section class="step" data-step="Install the packages">
+  <p class="lead">The template already has React, Vite, TypeScript and Tailwind. Add the packages that make it talk to the backend.</p>
+  <div class="codeblock" data-lang="bash" data-file="terminal (inside frontend/)"><pre><code>npm install axios react-router-dom react-hook-form @hookform/resolvers zod sweetalert2</code></pre></div>
+  <table>
+    <tr><th>Package</th><th>Why you need it</th></tr>
+    <tr><td><code>axios</code></td><td>HTTP calls to the API, with interceptors and automatic JSON</td></tr>
+    <tr><td><code>react-router-dom</code></td><td>Several pages in one app: <code>Link</code>, <code>useNavigate</code>, <code>useParams</code>, <code>useSearchParams</code></td></tr>
+    <tr><td><code>react-hook-form</code></td><td>Form state, submit and errors without a <code>useState</code> for every input</td></tr>
+    <tr><td><code>zod</code> + <code>@hookform/resolvers</code></td><td>Form rules (the same library as the backend), plugged into react-hook-form</td></tr>
+    <tr><td><code>sweetalert2</code></td><td>Nice popups for success, errors and the status picker</td></tr>
+  </table>
+  <p>Check that <code>vite.config.ts</code> has both plugins:</p>
+  <div class="codeblock" data-lang="typescript" data-file="vite.config.ts"><pre><code>import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss()
+  ],
+})</code></pre></div>
+</section>
+
+<section class="step" data-step="Fix the entry point in index.html">
+  <p class="lead">The template was written in JSX, but your project now uses TypeScript, so the entry file is <code>main.tsx</code>.</p>
+  <div class="warn"><b>⚠ Your index.html still says main.jsx</b>Your current <code>index.html</code> loads <code>/src/main.jsx</code>, which does not exist. Vite will show a blank page with a 404 error in the console. Change the script tag:</div>
+  <div class="codeblock" data-lang="html" data-file="index.html (bottom of body)"><pre><code>&lt;div id="root"&gt;&lt;/div&gt;
+&lt;script type="module" src="/src/main.tsx"&gt;&lt;/script&gt;</code></pre></div>
+  <p>Leave the Google Fonts links in the <code>&lt;head&gt;</code> as they are. The design tokens in <code>index.css</code> use <code>Instrument Sans</code> and <code>DM Mono</code>.</p>
+</section>
+
+<section class="step" data-step="Start both servers">
+  <p class="lead">You need two terminals while you work.</p>
+  <div class="codeblock" data-lang="bash" data-file="terminal 1"><pre><code>cd backend
+npm run dev        # → http://localhost:5000</code></pre></div>
+  <div class="codeblock" data-lang="bash" data-file="terminal 2"><pre><code>cd frontend
+npm run dev        # → http://localhost:5173</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint</b>Open <a href="http://localhost:5000/api/listings/list">localhost:5000/api/listings/list</a> and you should see the 8 seeded listings as JSON. Then open <code>localhost:5173</code>.</div>
+</section>
+
+<!-- ===================================================== PHASE 2 -->
+<div class="phase" id="phase2">
+  <div class="phase-label">Phase 2</div>
+  <h2>The data layer</h2>
+</div>
+
+<section class="step" data-step="TypeScript types">
+  <p class="lead">Describe the JSON the backend sends. Then TypeScript can autocomplete <code>listing.title</code> and warn you about typos.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/types/Listing.ts"><pre><code>// The seller is populated by the backend, so userId comes back as an object
+export interface Seller {
+    _id: string;
+    name: string;
+    phone: string;
+    createdAt: string;
+}
+
+export interface Listing {
+    _id: string;
+    title: string;
+    price: number;
+    category: string;
+    place: string;
+    description: string;
+    image?: string | null;
+    status: 'Live' | 'Paused' | 'Sold';
+    views: number;
+    userId: Seller;
+    createdAt: string;
+    updatedAt: string;
+}</code></pre></div>
+  <div class="codeblock" data-lang="typescript" data-file="src/types/User.ts"><pre><code>export interface User {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+    createdAt: string;
+}
+
+export interface LoginResponse {
+    user: User;
+    token: string;
+}</code></pre></div>
+  <ul class="clean">
+    <li><code>userId</code> is typed as a <code>Seller</code> <b>object</b>, not a string, because the backend calls <code>.populate('userId', 'name phone createdAt')</code>.</li>
+    <li>Dates are <code>string</code> because JSON has no date type. MongoDB dates arrive as <code>"2026-09-22T10:00:00.000Z"</code>.</li>
+    <li><code>status</code> is a union of the three allowed values, the same as the backend's <code>STATUSES</code>.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Categories constant">
+  <p class="lead">Use the same list as the backend's <code>CATEGORIES</code>. If you send any other value, the API returns 400 "invalid category".</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/data/categories.ts"><pre><code>// The six categories of the design. The backend accepts exactly these.
+export const CATEGORIES = ["Cars", "Electronics", "Rentals", "Jobs", "Furniture", "Phones"];
+
+// the header strip adds "All" in front, to clear the filter
+export const FILTERS = ["All", ...CATEGORIES];</code></pre></div>
+</section>
+
+<section class="step" data-step="The axios instance">
+  <p class="lead">One configured axios instance: the base URL is written once, and the token is added to every request automatically.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/services/api.ts"><pre><code>import axios from "axios";
+
+const api = axios.create({
+    baseURL: 'http://localhost:5000/api',
+    timeout: 10000
+})
+
+
+// before every request, add the token if the user is logged in
+api.interceptors.request.use((config)=&gt;{
+
+    const token = localStorage.getItem('token');
+
+    if(token){
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+})
+
+
+export default api;</code></pre></div>
+  <ul class="clean">
+    <li>Thanks to <code>baseURL</code>, services write <code>api.get('/listings/list')</code> instead of the full URL.</li>
+    <li>The <b>request interceptor</b> runs before every request. It reads the token saved at login and sets <code>Authorization: Bearer …</code>, the header the backend's <code>authenticate</code> middleware expects.</li>
+    <li><code>timeout: 10000</code> gives up after 10 seconds instead of waiting forever.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Auth service">
+  <p class="lead">Everything about the logged-in user is in one object: register, login, logout and "who is logged in?".</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/services/authService.ts"><pre><code>import api from "./api";
+import type { User, LoginResponse } from "../types/User";
+
+
+export const authService = {
+
+    // the backend logs you in straight away, so we save the token here too
+    register: async ( data: { name: string, email: string, phone: string, password: string } ) : Promise&lt;LoginResponse&gt; =&gt;{
+
+        const response = await api.post('/users/register', data);
+        const result: LoginResponse = response.data.data;
+
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify(result.user));
+
+        return result;
+    },
+
+    login: async ( data: { email: string, password: string } ) : Promise&lt;LoginResponse&gt; =&gt;{
+
+        const response = await api.post('/users/login', data);
+        const result: LoginResponse = response.data.data;
+
+        // keep the token and the user in the browser
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify(result.user));
+
+        return result;
+    },
+
+    logout: () : void =&gt;{
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+    },
+
+    // the user saved at login, or null when nobody is logged in
+    getCurrentUser: () : User | null =&gt;{
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    },
+
+    isLoggedIn: () : boolean =&gt;{
+        return localStorage.getItem('token') !== null;
+    }
+
+}</code></pre></div>
+  <ul class="clean">
+    <li>The backend wraps everything in <code>{ success, data, message }</code>, and axios wraps that in its own <code>response.data</code>. That is why you read <b><code>response.data.data</code></b>.</li>
+    <li>The token and the user are saved in <code>localStorage</code>, so you stay logged in after a page refresh.</li>
+    <li><code>localStorage</code> only stores strings. Use <code>JSON.stringify</code> to save the user and <code>JSON.parse</code> to read it back.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Listing service">
+  <p class="lead">One function per backend endpoint. Pages never need to know the URLs.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/services/listingService.ts"><pre><code>import api from "./api";
+import type { Listing } from "../types/Listing";
+
+
+export const listingService = {
+
+    // every listing. the three filters are optional:
+    // cat  -&gt; 'Cars', 'Phones' ... ( 'All' or nothing shows everything )
+    // q    -&gt; a word to look for in the title
+    // sort -&gt; 'newest' | 'price_asc' | 'price_desc'
+    getAll: async ( filters?: { cat?: string, q?: string, sort?: string } ) : Promise&lt;Listing[]&gt; =&gt;{
+        const response = await api.get('/listings/list', { params: filters });
+        return response.data.data;
+    },
+
+    // one listing, for the detail page. this also adds +1 to its views
+    getById: async (id: string) : Promise&lt;Listing&gt; =&gt;{
+        const response = await api.get('/listings/byid/' + id);
+        return response.data.data;
+    },
+
+    // the listings of the logged in user, whatever their status
+    getMine: async () : Promise&lt;Listing[]&gt; =&gt;{
+        const response = await api.get('/listings/mine');
+        return response.data.data;
+    },
+
+    // we send FormData because a listing can have a photo
+    create: async (data: FormData) : Promise&lt;Listing&gt; =&gt;{
+        const response = await api.post('/listings/create', data);
+        return response.data.data;
+    },
+
+    update: async (id: string, data: { status?: string, title?: string, price?: number }) : Promise&lt;Listing&gt; =&gt;{
+        const response = await api.put('/listings/edit/' + id, data);
+        return response.data.data;
+    },
+
+    delete: async (id: string) : Promise&lt;void&gt; =&gt;{
+        await api.delete('/listings/delete/' + id);
+    }
+
+}</code></pre></div>
+  <ul class="clean">
+    <li><code>{ params: filters }</code> lets axios build the query string for you: <code>{ cat: 'Cars', sort: 'price_asc' }</code> becomes <code>?cat=Cars&amp;sort=price_asc</code>. Axios also encodes special characters.</li>
+    <li><code>create</code> takes a <b><code>FormData</code></b>, not an object, because a photo cannot travel inside JSON. Axios sets the <code>multipart/form-data</code> header itself.</li>
+    <li>You do not pass the token anywhere: the interceptor in <code>api.ts</code> adds it.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Display helpers">
+  <p class="lead">Small formatting functions that several pages share.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/services/helpers.ts"><pre><code>// Small helpers used by the pages, so we do not repeat them everywhere.
+
+// 480000  -&gt;  "₹4,80,000"    ( en-IN puts the commas the indian way )
+export const formatPrice = (price: number) : string =&gt;{
+    return '₹' + price.toLocaleString('en-IN');
+}
+
+// "2026-09-22T10:00:00.000Z"  -&gt;  "2 hours ago"
+export const timeAgo = (date: string) : string =&gt;{
+
+    const seconds = ( Date.now() - new Date(date).getTime() ) / 1000;
+
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if(minutes &lt; 1)  return 'just now';
+    if(minutes &lt; 60) return minutes === 1 ? '1 minute ago' : minutes + ' minutes ago';
+    if(hours &lt; 24)   return hours === 1 ? '1 hour ago' : hours + ' hours ago';
+    if(days === 1)   return 'yesterday';
+
+    return days + ' days ago';
+}
+
+// "2023-04-01T..."  -&gt;  "2023"
+export const yearOf = (date: string) : string =&gt;{
+    return new Date(date).getFullYear().toString();
+}
+
+// the backend gives "/uploads/listings/listing-123.jpg", the browser needs the full url
+export const imageUrl = (image?: string | null) : string | null =&gt;{
+    return image ? 'http://localhost:5000' + image : null;
+}</code></pre></div>
+  <p><code>imageUrl</code> matters most here. The database stores <code>/uploads/listings/…jpg</code>, but that file is on the <b>backend</b> server (port 5000), not on Vite (port 5173).</p>
+</section>
+
+<!-- ===================================================== PHASE 3 -->
+<div class="phase" id="phase3">
+  <div class="phase-label">Phase 3</div>
+  <h2>Routing</h2>
+</div>
+
+<section class="step" data-step="Wrap the app in a router">
+  <p class="lead"><code>BrowserRouter</code> watches the URL bar. Every <code>Link</code>, <code>useNavigate</code> and <code>useParams</code> must be inside it.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/main.tsx"><pre><code>import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css";
+import App from "./App.tsx";
+
+createRoot(document.getElementById("root")!).render(
+  &lt;StrictMode&gt;
+    &lt;BrowserRouter&gt;
+      &lt;App /&gt;
+    &lt;/BrowserRouter&gt;
+  &lt;/StrictMode&gt;
+);</code></pre></div>
+</section>
+
+<section class="step" data-step="Declare the routes">
+  <p class="lead">Each URL maps to one template page.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/App.tsx"><pre><code>import { Routes, Route } from "react-router-dom";
+import Browse from "./pages/Browse.tsx";
+import Results from "./pages/Results.tsx";
+import ListingDetail from "./pages/ListingDetail.tsx";
+import SignIn from "./pages/SignIn.tsx";
+import SignUp from "./pages/SignUp.tsx";
+import PostListing from "./pages/PostListing.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+
+// Each page holds its own header and footer, so there is no shared layout.
+function App() {
+  return (
+    &lt;Routes&gt;
+      &lt;Route path="/" element={&lt;Browse /&gt;} /&gt;
+      &lt;Route path="/search" element={&lt;Results /&gt;} /&gt;
+      &lt;Route path="/listing/:id" element={&lt;ListingDetail /&gt;} /&gt;
+
+      {/* account */}
+      &lt;Route path="/signin" element={&lt;SignIn /&gt;} /&gt;
+      &lt;Route path="/signup" element={&lt;SignUp /&gt;} /&gt;
+      &lt;Route path="/post" element={&lt;PostListing /&gt;} /&gt;
+      &lt;Route path="/dashboard" element={&lt;Dashboard /&gt;} /&gt;
+    &lt;/Routes&gt;
+  );
+}
+
+export default App;</code></pre></div>
+  <p><code>:id</code> is a <b>URL parameter</b>. For <code>/listing/66f1a…</code>, the detail page reads <code>66f1a…</code> with <code>useParams()</code>.</p>
+  <h3>Why the template uses <code>Link</code>, not <code>&lt;a href&gt;</code></h3>
+  <p>A <code>Link</code> changes the page <b>without reloading</b> the browser, so React keeps its state and the new page appears instantly. Use <code>&lt;a href&gt;</code> only for links that leave the app, such as <code>tel:</code> or another website.</p>
+  <div class="codeblock" data-lang="tsx" data-file="example"><pre><code>&lt;Link to={item === "All" ? "/search" : "/search?cat=" + item} className="…"&gt;
+  {item}
+&lt;/Link&gt;</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint</b>Click around: logo → home, category chips → <code>/search?cat=…</code>, "Sign in" → <code>/signin</code>. The page should change with no white flash.</div>
+</section>
+
+<!-- ===================================================== PHASE 4 -->
+<div class="phase" id="phase4">
+  <div class="phase-label">Phase 4</div>
+  <h2>Accounts: sign up, sign in, sign out</h2>
+</div>
+
+<section class="step" data-step="Sign in page (react-hook-form + zod)">
+  <p class="lead">Turn the template's static form into a validated form that logs the user in.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/SignIn.tsx (logic)"><pre><code>import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Swal from "sweetalert2";
+import { authService } from "../services/authService";
+
+// the rules of the form
+const signInSchema = z.object({
+  email: z.string().email("invalid email"),
+  password: z.string().min(6, "password must contain at least 6 characters"),
+});
+
+type SignInForm = z.infer&lt;typeof signInSchema&gt;;
+
+// Sign in: react-hook-form + zod, exactly like the forms lesson.
+function SignIn() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+  const [query, setQuery] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm&lt;SignInForm&gt;({ resolver: zodResolver(signInSchema) });
+
+  const onSubmit = async (data: SignInForm) =&gt; {
+    try {
+      await authService.login(data);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Welcome back !",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not sign in",
+        text: err.response?.data?.error || "Something went wrong",
+      });
+      console.log(err);
+    }
+  };
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <p>Now connect the template's form to it. Three changes: <code>onSubmit</code> on the form, <code>{...register("name")}</code> on each input, and an error line under each input.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/SignIn.tsx (JSX, classes trimmed)"><pre><code>&lt;form onSubmit={handleSubmit(onSubmit)} className="…"&gt;
+  &lt;label className="…"&gt;
+    Email
+    &lt;input type="email" placeholder="you@example.com" {...register("email")} className="…" /&gt;
+    {errors.email &amp;&amp; (
+      &lt;span className="text-[13px] text-[#C2410C]"&gt;{errors.email.message}&lt;/span&gt;
+    )}
+  &lt;/label&gt;
+
+  &lt;label className="…"&gt;
+    Password
+    &lt;input type="password" placeholder="••••••••" {...register("password")} className="…" /&gt;
+    {errors.password &amp;&amp; (
+      &lt;span className="text-[13px] text-[#C2410C]"&gt;{errors.password.message}&lt;/span&gt;
+    )}
+  &lt;/label&gt;
+
+  &lt;button type="submit" disabled={isSubmitting} className="…"&gt;
+    {isSubmitting ? "Signing in ..." : "Sign in"}
+  &lt;/button&gt;
+&lt;/form&gt;</code></pre></div>
+  <ul class="clean">
+    <li><code>{...register("email")}</code> gives the input its <code>name</code>, <code>onChange</code>, <code>onBlur</code> and <code>ref</code>. You do not need <code>useState</code> for the inputs.</li>
+    <li><code>handleSubmit(onSubmit)</code> runs the zod rules first. <code>onSubmit</code> is called <b>only</b> when the data is valid, and it receives typed data.</li>
+    <li><code>isSubmitting</code> is <code>true</code> while the <code>async</code> onSubmit runs. Use it to disable the button so the form cannot be sent twice.</li>
+    <li><code>err.response?.data?.error</code> shows the backend's message, for example "Invalid email or password".</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Sign up page">
+  <p class="lead">This page works the same way as sign in, with two more fields. The backend logs the user in right away, so you go straight to the dashboard.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/SignUp.tsx (logic)"><pre><code>import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Swal from "sweetalert2";
+import { authService } from "../services/authService";
+
+const signUpSchema = z.object({
+  name: z.string().min(2, "name must contain at least 2 characters"),
+  email: z.string().email("invalid email"),
+  phone: z.string().min(6, "phone must contain at least 6 characters"),
+  password: z.string().min(6, "password must contain at least 6 characters"),
+});
+
+type SignUpForm = z.infer&lt;typeof signUpSchema&gt;;
+
+// Sign up. The backend logs you in right away, so we land on the dashboard.
+function SignUp() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+  const [query, setQuery] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm&lt;SignUpForm&gt;({ resolver: zodResolver(signUpSchema) });
+
+  const onSubmit = async (data: SignUpForm) =&gt; {
+    try {
+      await authService.register(data);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your account is ready !",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not create the account",
+        text: err.response?.data?.error || "Something went wrong",
+      });
+      console.log(err);
+    }
+  };
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <p>In the JSX, add <code>{...register("name")}</code>, <code>"email"</code>, <code>"phone"</code> and <code>"password"</code> to the four inputs, plus an <code>errors.x</code> line under each, just like on the sign in page.</p>
+  <div class="note"><b>Keep the rules in sync</b>The frontend zod rules repeat the backend ones (name ≥ 2, phone ≥ 6, password ≥ 6), so users see the error instantly. The backend still checks everything, because a frontend can always be bypassed.</div>
+</section>
+
+<section class="step" data-step="Header: search box and sign in / sign out">
+  <p class="lead">Every page has the template's header, and every page wires it the same way.</p>
+  <div class="codeblock" data-lang="tsx" data-file="the same in every page"><pre><code>const navigate = useNavigate();
+const user = authService.getCurrentUser();
+const [query, setQuery] = useState("");
+
+const handleSearch = (e: FormEvent) =&gt; {
+  e.preventDefault();                 // stop the browser from reloading the page
+  navigate("/search?q=" + query);
+};
+
+const handleSignOut = () =&gt; {
+  authService.logout();
+  navigate("/");
+};</code></pre></div>
+  <div class="codeblock" data-lang="tsx" data-file="header JSX (classes trimmed)"><pre><code>&lt;form onSubmit={handleSearch} className="…"&gt;
+  &lt;input type="text" value={query} onChange={(e) =&gt; setQuery(e.target.value)} className="…" /&gt;
+  &lt;button type="submit" className="…"&gt;Search&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;nav className="…"&gt;
+  &lt;Link to="/dashboard" className="…"&gt;My listings&lt;/Link&gt;
+
+  {/* when somebody is logged in, this pill becomes Sign out */}
+  {user ? (
+    &lt;button type="button" onClick={handleSignOut} className="…"&gt;Sign out&lt;/button&gt;
+  ) : (
+    &lt;Link to="/signin" className="…"&gt;Sign in&lt;/Link&gt;
+  )}
+
+  &lt;Link to="/post" className="…"&gt;Post a listing&lt;/Link&gt;
+&lt;/nav&gt;</code></pre></div>
+  <p>The search box is a <b>controlled input</b>: React state holds the value (<code>value={query}</code>) and every key press updates it (<code>onChange</code>).</p>
+  <div class="ok"><b>✅ Checkpoint</b>Create an account → you land on <code>/dashboard</code>. In DevTools → Application → Local Storage you should see <code>token</code> and <code>user</code>. Sign out → both are removed. Sign in as <code>rohan@gmail.com</code> / <code>123456</code>.</div>
+</section>
+
+<!-- ===================================================== PHASE 5 -->
+<div class="phase" id="phase5">
+  <div class="phase-label">Phase 5</div>
+  <h2>Browsing: real data in the template</h2>
+</div>
+
+<section class="step" data-step="Home page: fetch and render listings">
+  <p class="lead">This is the pattern you will reuse everywhere: <b>state → useEffect fetch → loading / error / empty → map to cards</b>.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/Browse.tsx (logic)"><pre><code>import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import type { Listing } from "../types/Listing";
+import { listingService } from "../services/listingService";
+import { authService } from "../services/authService";
+import { formatPrice, timeAgo, imageUrl } from "../services/helpers";
+import { FILTERS } from "../data/categories";
+
+// The home screen: hero, category tiles and the newest listings.
+function Browse() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+
+  const [listings, setListings] = useState&lt;Listing[]&gt;([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+  const [query, setQuery] = useState("");
+
+  useEffect(() =&gt; {
+    const fetchListings = async () =&gt; {
+      try {
+        setLoading(true);
+        const data = await listingService.getAll();
+        setListings(data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError("Failed to load the listings");
+        console.log(err);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  // the newest eight go in the "Fresh today" grid
+  const fresh = listings.slice(0, 8);
+
+  // how many listings are in one category, for the tiles
+  const countOf = (category: string) =&gt;
+    listings.filter((item) =&gt; item.category === category).length;
+
+  const tiles = [
+    { cat: "Cars", label: "Cars &amp; bikes", glyph: "⛋" },
+    { cat: "Electronics", label: "Electronics", glyph: "▭" },
+    { cat: "Rentals", label: "Rentals", glyph: "⌂" },
+    { cat: "Jobs", label: "Jobs", glyph: "◈" },
+  ];
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <p>Replace the template's hard-coded cards with <b>one card inside a <code>.map()</code></b>:</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/Browse.tsx (JSX, classes trimmed)"><pre><code>{loading &amp;&amp; &lt;p className="…"&gt;Loading listings ...&lt;/p&gt;}
+
+{error &amp;&amp; &lt;p className="…"&gt;{error}&lt;/p&gt;}
+
+{!loading &amp;&amp; listings.length === 0 &amp;&amp; (
+  &lt;p className="…"&gt;Nothing posted yet. Be the first one.&lt;/p&gt;
+)}
+
+&lt;div className="grid grid-cols-4 gap-4.5"&gt;
+  {fresh.map((item) =&gt; (
+    &lt;Link key={item._id} to={"/listing/" + item._id} className="…"&gt;
+      &lt;div className="relative aspect-[4/3] overflow-hidden rounded-[14px]"&gt;
+        {item.image ? (
+          &lt;img src={imageUrl(item.image)!} alt={item.title} className="size-full object-cover" /&gt;
+        ) : (
+          &lt;div className="placeholder-fill size-full" /&gt;
+        )}
+        &lt;span className="…"&gt;{item.category}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;p className="…"&gt;{formatPrice(item.price)}&lt;/p&gt;
+      &lt;h3 className="…"&gt;{item.title}&lt;/h3&gt;
+      &lt;p className="…"&gt;{item.place} · {timeAgo(item.createdAt)}&lt;/p&gt;
+    &lt;/Link&gt;
+  ))}
+&lt;/div&gt;</code></pre></div>
+  <ul class="clean">
+    <li>The empty array <code>[]</code> at the end of <code>useEffect</code> means "run once, when the page opens".</li>
+    <li>You cannot make the <code>useEffect</code> callback itself <code>async</code>. Define an async function inside it and call that function.</li>
+    <li><code>key={item._id}</code> helps React track each card. Use the database id, not the array index.</li>
+    <li>Values like <code>fresh</code> and <code>countOf()</code> are <b>calculated</b> from <code>listings</code> on every render. They do not need their own state.</li>
+    <li>When there is no photo, show the template's <code>placeholder-fill</code> block instead.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Results page: filters in the URL">
+  <p class="lead">Keep the category and the search text in the <b>URL</b> (<code>/search?cat=Cars&amp;q=swift</code>). Then a refresh, the back button or a shared link all show the same results.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/Results.tsx (logic)"><pre><code>import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import type { Listing } from "../types/Listing";
+import { listingService } from "../services/listingService";
+import { authService } from "../services/authService";
+import { formatPrice, timeAgo, imageUrl } from "../services/helpers";
+import { FILTERS } from "../data/categories";
+
+// The results grid. The filter lives in the url ( /search?cat=Cars&amp;q=swift )
+// so it survives a refresh, and the backend does the filtering and the sorting.
+function Results() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+  const [searchParams] = useSearchParams();
+
+  // the two filters come from the url
+  const cat = searchParams.get("cat") || "All";
+  const q = searchParams.get("q") || "";
+
+  const [sort, setSort] = useState("newest");
+  const [listings, setListings] = useState&lt;Listing[]&gt;([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+  const [query, setQuery] = useState(q);
+
+  // this runs again every time the category, the search or the sort changes
+  useEffect(() =&gt; {
+    const fetchListings = async () =&gt; {
+      try {
+        setLoading(true);
+        const data = await listingService.getAll({ cat, q, sort });
+        setListings(data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError("Failed to load the listings");
+        console.log(err);
+      }
+    };
+
+    fetchListings();
+  }, [cat, q, sort]);
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  const sorts = [
+    { key: "newest", label: "Newest" },
+    { key: "price_asc", label: "Price low" },
+    { key: "price_desc", label: "Price high" },
+  ];
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <div class="codeblock" data-lang="tsx" data-file="sort buttons (classes trimmed)"><pre><code>{sorts.map((item) =&gt; (
+  &lt;button
+    key={item.key}
+    type="button"
+    onClick={() =&gt; setSort(item.key)}
+    className={item.key === sort ? "…active…" : "…"}
+  &gt;
+    {item.label}
+  &lt;/button&gt;
+))}</code></pre></div>
+  <ul class="clean">
+    <li><code>useSearchParams()</code> reads the query string. <code>searchParams.get("cat")</code> returns <code>"Cars"</code>, or <code>null</code> when it is not there, so add <code>|| "All"</code>.</li>
+    <li>The dependency array <code>[cat, q, sort]</code> means "fetch again whenever one of these changes". Click a category chip and the URL changes, then <code>cat</code> changes, then the effect runs again.</li>
+    <li>The <b>backend</b> filters and sorts. The page only displays what comes back.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Listing detail: useParams + reveal phone">
+  <p class="lead">Read the id from the URL, load that listing, and show the seller's phone only after a click.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/ListingDetail.tsx (logic)"><pre><code>import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import type { Listing } from "../types/Listing";
+import { listingService } from "../services/listingService";
+import { authService } from "../services/authService";
+import { formatPrice, timeAgo, yearOf, imageUrl } from "../services/helpers";
+import { FILTERS } from "../data/categories";
+
+// One listing, found with the id in the url. Opening this page also adds
+// +1 to the views counter, the backend does it inside getById.
+function ListingDetail() {
+  const { id } = useParams&lt;{ id: string }&gt;();
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+
+  const [listing, setListing] = useState&lt;Listing | null&gt;(null);
+  const [similar, setSimilar] = useState&lt;Listing[]&gt;([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+  const [query, setQuery] = useState("");
+
+  // the number is hidden again every time another listing is opened
+  const [showPhone, setShowPhone] = useState(false);
+
+  useEffect(() =&gt; {
+    const fetchListing = async () =&gt; {
+      try {
+        setLoading(true);
+        setShowPhone(false);
+
+        const data = await listingService.getById(id!);
+        setListing(data);
+
+        // "similar" is simply the first four other listings
+        const all = await listingService.getAll();
+        setSimilar(all.filter((item) =&gt; item._id !== id).slice(0, 4));
+
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError("This listing could not be loaded");
+        console.log(err);
+      }
+    };
+
+    fetchListing();
+  }, [id]);
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <div class="codeblock" data-lang="tsx" data-file="seller card (classes trimmed)"><pre><code>{listing &amp;&amp; (
+  &lt;&gt;
+    &lt;p className="…"&gt;{formatPrice(listing.price)}&lt;/p&gt;
+    &lt;p className="…"&gt;{listing.userId.name}&lt;/p&gt;
+    &lt;p className="…"&gt;Member since {yearOf(listing.userId.createdAt)}&lt;/p&gt;
+
+    {showPhone ? (
+      &lt;p className="…"&gt;{listing.userId.phone}&lt;/p&gt;
+    ) : (
+      &lt;button type="button" onClick={() =&gt; setShowPhone(true)} className="…"&gt;
+        Show phone number
+      &lt;/button&gt;
+    )}
+
+    &lt;a href={"tel:" + listing.userId.phone} className="…"&gt;Call seller&lt;/a&gt;
+  &lt;/&gt;
+)}</code></pre></div>
+  <ul class="clean">
+    <li><code>listing</code> starts as <code>null</code>, so wrap the JSX in <code>{listing &amp;&amp; (…)}</code>. Otherwise <code>listing.title</code> crashes on the first render.</li>
+    <li>The effect depends on <code>[id]</code>. When you click a "similar" card, the URL changes, the effect runs again, and the phone number is hidden again.</li>
+    <li><code>listing.userId.name</code> works because the backend populated the seller.</li>
+  </ul>
+  <div class="ok"><b>✅ Checkpoint</b>Open a listing, refresh it a few times, and its <b>views</b> number goes up, because the backend runs <code>$inc</code> on every <code>getById</code>.</div>
+</section>
+
+<!-- ===================================================== PHASE 6 -->
+<div class="phase" id="phase6">
+  <div class="phase-label">Phase 6</div>
+  <h2>Seller features</h2>
+</div>
+
+<section class="step" data-step="Post a listing (FormData + photo)">
+  <p class="lead">This is the biggest form. It has validated text fields, a category picker, a photo, a live preview card and a success screen.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/PostListing.tsx (logic)"><pre><code>import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Swal from "sweetalert2";
+import { listingService } from "../services/listingService";
+import { authService } from "../services/authService";
+import { formatPrice } from "../services/helpers";
+import { CATEGORIES } from "../data/categories";
+
+const postSchema = z.object({
+  title: z.string().min(5, "title must contain at least 5 characters"),
+  price: z.string().min(1, "price is required").regex(/^[0-9]+$/, "price must be digits only"),
+  place: z.string().min(2, "location is required"),
+  description: z.string().min(10, "description must contain at least 10 characters"),
+});
+
+type PostForm = z.infer&lt;typeof postSchema&gt;;
+
+// The post form. The photo cannot travel inside json, so everything is sent
+// in a FormData and multer takes the file out on the other side.
+function PostListing() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+  const [query, setQuery] = useState("");
+
+  const [category, setCategory] = useState("Cars");
+  const [image, setImage] = useState&lt;File | null&gt;(null);
+  const [posted, setPosted] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm&lt;PostForm&gt;({ resolver: zodResolver(postSchema) });
+
+  useEffect(() =&gt; {
+    // you cannot post a listing without being logged in
+    if (!authService.isLoggedIn()) {
+      navigate("/signin");
+    }
+  }, [navigate]);
+
+  // the live preview reads the fields while you type
+  const previewTitle = watch("title");
+  const previewPrice = watch("price");
+  const previewPlace = watch("place");
+
+  const onSubmit = async (data: PostForm) =&gt; {
+    try {
+      const body = new FormData();
+
+      body.append("title", data.title);
+      body.append("price", data.price);
+      body.append("place", data.place);
+      body.append("description", data.description);
+      body.append("category", category);
+
+      if (image) {
+        body.append("image", image);
+      }
+
+      await listingService.create(body);
+
+      setPosted(true);
+      window.scrollTo(0, 0);
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not publish the listing",
+        text: err.response?.data?.error || "Something went wrong",
+      });
+      console.log(err);
+    }
+  };
+
+  const postAnother = () =&gt; {
+    reset();
+    setImage(null);
+    setCategory("Cars");
+    setPosted(false);
+  };
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <div class="codeblock" data-lang="tsx" data-file="category chips + photo input (classes trimmed)"><pre><code>{CATEGORIES.map((item) =&gt; (
+  &lt;button key={item} type="button" onClick={() =&gt; setCategory(item)}
+    className={item === category ? "…selected…" : "…"}&gt;
+    {item}
+  &lt;/button&gt;
+))}
+
+{/* the label opens the hidden file input */}
+&lt;label className="…"&gt;
+  &lt;span&gt;+&lt;/span&gt;
+  &lt;input
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={(e) =&gt; setImage(e.target.files ? e.target.files[0] : null)}
+  /&gt;
+&lt;/label&gt;
+
+{image ? (
+  &lt;img src={URL.createObjectURL(image)} alt="the photo you picked" className="…" /&gt;
+) : (
+  &lt;div className="placeholder-fill …" /&gt;
+)}</code></pre></div>
+  <ul class="clean">
+    <li><b>Route guard:</b> the <code>useEffect</code> sends visitors who are not logged in to <code>/signin</code>.</li>
+    <li><b>FormData:</b> <code>body.append("image", image)</code>. The name <code>"image"</code> <b>must</b> match <code>upload.single('image')</code> on the backend.</li>
+    <li>The price is kept as a <b>string</b> in the form (inputs always give text). The backend's <code>z.coerce.number()</code> turns it into a number.</li>
+    <li>The <b>category</b> and the <b>photo</b> are not normal text inputs, so they live in <code>useState</code> instead of <code>register</code>.</li>
+    <li><code>watch("title")</code> re-renders the page on every key press, so the preview card updates live.</li>
+    <li><code>URL.createObjectURL(file)</code> makes a temporary local URL, so you can preview the photo <b>before</b> uploading it.</li>
+    <li>After success, <code>posted</code> becomes <code>true</code> and the page shows the template's "Your listing is live" panel. <code>postAnother()</code> clears everything with <code>reset()</code>.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Dashboard: my listings, stats, edit status">
+  <p class="lead">Show the logged-in user's listings with live counters, tabs, and a popup to change a listing's status.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/Dashboard.tsx (logic)"><pre><code>import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import type { Listing } from "../types/Listing";
+import { listingService } from "../services/listingService";
+import { authService } from "../services/authService";
+import { formatPrice, timeAgo, yearOf, imageUrl } from "../services/helpers";
+
+// the colours of the three status pills
+const STATUS_STYLE: Record&lt;string, string&gt; = {
+  Live: "bg-[rgba(23,114,69,0.08)] text-[#177245]",
+  Paused: "bg-[rgba(138,90,0,0.08)] text-[#8A5A00]",
+  Sold: "bg-[rgba(19,19,22,0.06)] text-ink-3",
+};
+
+const STATUS_DOT: Record&lt;string, string&gt; = {
+  Live: "bg-[#22A45D]",
+  Paused: "bg-[#D98A00]",
+  Sold: "bg-ink-5",
+};
+
+// My listings. The four numbers on top are counted from the rows we already
+// have, so they stay right after an edit without asking the server again.
+function Dashboard() {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+
+  const [listings, setListings] = useState&lt;Listing[]&gt;([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+  const [query, setQuery] = useState("");
+  const [tab, setTab] = useState("All");
+
+  useEffect(() =&gt; {
+    // you cannot open the dashboard without being logged in
+    if (!authService.isLoggedIn()) {
+      navigate("/signin");
+      return;
+    }
+
+    const fetchMine = async () =&gt; {
+      try {
+        setLoading(true);
+        const data = await listingService.getMine();
+        setListings(data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError("Failed to load your listings");
+        console.log(err);
+      }
+    };
+
+    fetchMine();
+  }, [navigate]);
+
+  const handleSearch = (e: FormEvent) =&gt; {
+    e.preventDefault();
+    navigate("/search?q=" + query);
+  };
+
+  const handleSignOut = () =&gt; {
+    authService.logout();
+    navigate("/");
+  };
+
+  // the tabs only filter the rows we already have
+  const rows = tab === "All" ? listings : listings.filter((item) =&gt; item.status === tab);
+
+  // the four numbers on top
+  const active = listings.filter((item) =&gt; item.status === "Live").length;
+  const sold = listings.filter((item) =&gt; item.status === "Sold").length;
+  const totalViews = listings.reduce((total, item) =&gt; total + item.views, 0);
+
+  // "Edit" changes the status of one listing
+  const handleEdit = (listing: Listing) =&gt; {
+    Swal.fire({
+      title: "Change the status",
+      input: "select",
+      inputOptions: { Live: "Live", Paused: "Paused", Sold: "Sold" },
+      inputValue: listing.status,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#3B5BFF",
+    }).then(async (result) =&gt; {
+      if (result.isConfirmed) {
+        try {
+          const updated = await listingService.update(listing._id, { status: result.value });
+          setListings((prev) =&gt;
+            prev.map((item) =&gt; (item._id === listing._id ? updated : item))
+          );
+        } catch (err) {
+          setError("Failed to update the listing");
+          console.log(err);
+        }
+      }
+    });
+  };
+
+  return (
+    // ... the template JSX, see below ...
+  );
+}</code></pre></div>
+  <div class="codeblock" data-lang="tsx" data-file="one row (classes trimmed)"><pre><code>{rows.map((item) =&gt; (
+  &lt;div key={item._id} className="grid …"&gt;
+    {item.image ? &lt;img src={imageUrl(item.image)!} alt={item.title} className="…" /&gt;
+                : &lt;div className="placeholder-fill …" /&gt;}
+
+    &lt;Link to={"/listing/" + item._id} className="…"&gt;{item.title}&lt;/Link&gt;
+    &lt;p className="…"&gt;{formatPrice(item.price)}&lt;/p&gt;
+    &lt;p className="…"&gt;{item.views}&lt;/p&gt;
+
+    &lt;span className={"… " + STATUS_STYLE[item.status]}&gt;
+      &lt;span className={"size-1.5 rounded-full " + STATUS_DOT[item.status]} /&gt;
+      {item.status}
+    &lt;/span&gt;
+
+    &lt;button type="button" onClick={() =&gt; handleEdit(item)} className="…"&gt;Edit&lt;/button&gt;
+  &lt;/div&gt;
+))}</code></pre></div>
+  <ul class="clean">
+    <li><code>getMine()</code> calls a 🔒 route. It works because the interceptor sends the token.</li>
+    <li>The tabs and the counters are <b>calculated</b> from <code>listings</code>, so they update by themselves when one listing changes.</li>
+    <li>After the update, replace the one changed listing inside the array with <code>prev.map(…)</code>, so you do not need to load the whole list again.</li>
+    <li><code>STATUS_STYLE[item.status]</code> picks the template's pill colour for each status.</li>
+  </ul>
+  <div class="ok"><b>✅ Checkpoint</b>Post a listing with a photo → it appears on the dashboard and on the home page. Change its status to <b>Sold</b> → the "Sold" counter goes up straight away.</div>
+</section>
+
+<!-- ===================================================== PHASE 7 -->
+<div class="phase" id="phase7">
+  <div class="phase-label">Phase 7</div>
+  <h2>Test and improve</h2>
+</div>
+
+<section class="step" data-step="Full test checklist">
+  <p class="lead">Go through the app as a real user would.</p>
+  <table>
+    <tr><th>Do this</th><th>Expected</th></tr>
+    <tr><td>Open <code>/</code></td><td>8 cards, tile counts and the total count</td></tr>
+    <tr><td>Click the "Cars" chip</td><td><code>/search?cat=Cars</code>, only cars</td></tr>
+    <tr><td>Sort by "Price high"</td><td>Most expensive first, URL unchanged</td></tr>
+    <tr><td>Search "macbook"</td><td>One result</td></tr>
+    <tr><td>Open a card → "Show phone number"</td><td>The number replaces the button</td></tr>
+    <tr><td>Open <code>/post</code> while logged out</td><td>Redirected to <code>/signin</code></td></tr>
+    <tr><td>Sign in with a wrong password</td><td>Popup "Invalid email or password"</td></tr>
+    <tr><td>Submit the post form empty</td><td>Red error under each field, no request sent</td></tr>
+    <tr><td>Post with a photo</td><td>Success panel, the photo shows on the home page</td></tr>
+    <tr><td>Dashboard → Edit → Paused</td><td>Pill turns amber, "Active" counter drops</td></tr>
+    <tr><td>Refresh any page</td><td>Still logged in</td></tr>
+  </table>
+  <div class="note"><b>Debugging tip</b>Open DevTools → <b>Network</b>, filter by <b>Fetch/XHR</b> and click a request. <i>Headers</i> shows whether <code>Authorization</code> was sent. <i>Response</i> shows the backend's exact error message.</div>
+</section>
+
+<section class="step" data-step="Add a delete button (exercise)">
+  <p class="lead"><code>listingService.delete</code> already exists, but the dashboard never uses it. Add the missing button.</p>
+  <div class="codeblock" data-lang="tsx" data-file="src/pages/Dashboard.tsx (add)"><pre><code>const handleDelete = (listing: Listing) =&gt; {
+  Swal.fire({
+    title: "Delete this listing?",
+    text: listing.title,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+    confirmButtonColor: "#C2410C",
+  }).then(async (result) =&gt; {
+    if (result.isConfirmed) {
+      try {
+        await listingService.delete(listing._id);
+        // remove the row locally, no need to fetch again
+        setListings((prev) =&gt; prev.filter((item) =&gt; item._id !== listing._id));
+      } catch (err) {
+        setError("Failed to delete the listing");
+        console.log(err);
+      }
+    }
+  });
+};
+
+// in the row, next to Edit:
+&lt;button type="button" onClick={() =&gt; handleDelete(item)} className="…"&gt;Delete&lt;/button&gt;</code></pre></div>
+  <p>Remember to widen the row's grid (<code>grid-cols-[…]</code>) by one column for the new button.</p>
+</section>
+
+<section class="step" data-step="Improvements (going further)">
+  <p class="lead">The app works. These changes make the code cleaner and safer. Each one is a good exercise.</p>
+  <table>
+    <tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+    <tr><td><b>A shared <code>Header</code> and <code>Footer</code></b></td><td>Every page repeats about 150 lines of header and footer, plus <code>handleSearch</code> and <code>handleSignOut</code>. A fix to the header has to be made 7 times.</td><td>Move them into <code>src/components/Header.tsx</code> and <code>Footer.tsx</code>, then use a layout route with <code>&lt;Outlet /&gt;</code> in <code>App.tsx</code>.</td></tr>
+    <tr><td><b>Encode the search text</b></td><td><code>"/search?q=" + query</code> breaks when the text contains <code>&amp;</code> or <code>#</code>.</td><td><code>navigate("/search?q=" + encodeURIComponent(query))</code></td></tr>
+    <tr><td><b>A <code>ProtectedRoute</code> component</b></td><td>The login check is copied into PostListing and Dashboard, and the page renders for a moment before the redirect.</td><td>Wrap the private routes: <code>isLoggedIn ? children : &lt;Navigate to="/signin" /&gt;</code></td></tr>
+    <tr><td><b>Log out on 401</b></td><td>When the token expires (after 7 days), private pages only show "Failed to load".</td><td>Add a <b>response</b> interceptor: on status 401, call <code>authService.logout()</code> and redirect to <code>/signin</code>.</td></tr>
+    <tr><td><b>An environment variable for the API URL</b></td><td><code>localhost:5000</code> is written in both <code>api.ts</code> and <code>helpers.ts</code>.</td><td><code>.env</code>: <code>VITE_API_URL=http://localhost:5000</code>, then read <code>import.meta.env.VITE_API_URL</code>.</td></tr>
+    <tr><td><b>A shared login state</b></td><td><code>getCurrentUser()</code> reads <code>localStorage</code> on each render, so other components are not told when the user logs in or out.</td><td>An <code>AuthContext</code> with <code>user</code>, <code>login</code> and <code>logout</code>, or a small store like Zustand.</td></tr>
+    <tr><td><b>Free the preview URL</b></td><td><code>URL.createObjectURL</code> runs on every render (and on every key press because of <code>watch</code>), and the URLs are never freed.</td><td>Create it once in a <code>useEffect</code> when <code>image</code> changes, and call <code>URL.revokeObjectURL</code> in the cleanup.</td></tr>
+    <tr><td><b>Real "Similar" listings</b></td><td>The detail page loads <b>every</b> listing just to show 4.</td><td><code>getAll({ cat: listing.category })</code>, and later a <code>limit</code> on the backend.</td></tr>
+    <tr><td><b>Image type and size check</b></td><td>The backend rejects files over 5 MB, but the user only finds out after sending.</td><td>Check <code>file.size</code> and <code>file.type</code> in the <code>onChange</code> before calling <code>setImage</code>.</td></tr>
+  </table>
+  <div class="ok"><b>🎉 Done</b>Your template is now a full-stack app. It has typed data, a single API layer, URL-driven filters, validated forms, token login and image uploads. For any new feature, follow the same order: <b>type → service function → page state → effect or handler → JSX</b>.</div>
+</section>
+
+</main>
+</div>
+<button class="menu-btn" id="menuBtn">☰ Steps</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function(){
+  // --- theme toggle
+  var root = document.documentElement;
+  function store(k, v){ try{ if(v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); }catch(e){ return null; } }
+  var saved = store('kiosk-fe-guide-theme');
+  if(saved) root.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').onclick = function(){
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); store('kiosk-fe-guide-theme', next);
+  };
+
+  // --- code blocks: header bar with file name + copy button
+  document.querySelectorAll('.codeblock').forEach(function(block){
+    var code = block.querySelector('code');
+    code.className = 'language-' + (block.dataset.lang || 'plaintext');
+    var bar = document.createElement('div'); bar.className = 'bar';
+    var name = document.createElement('span'); name.textContent = block.dataset.file || '';
+    var btn = document.createElement('button'); btn.textContent = 'Copy';
+    btn.onclick = function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      });
+    };
+    bar.appendChild(name); bar.appendChild(btn); block.insertBefore(bar, block.firstChild);
+  });
+  if(window.hljs) hljs.highlightAll();
+
+  // --- number steps, build the sidebar, progress checkboxes
+  var tocLinks = document.getElementById('toc-links');
+  var done = {};
+  try{ done = JSON.parse(store('kiosk-fe-guide-done') || '{}') || {}; }catch(e){}
+  var steps = document.querySelectorAll('section.step');
+  var phases = document.querySelectorAll('.phase');
+  var links = [];
+
+  function updateProgress(){
+    var n = steps.length, d = 0;
+    steps.forEach(function(s){ if(done[s.id]) d++; });
+    document.getElementById('bar').style.width = (d / n * 100) + '%';
+    document.getElementById('ptext').textContent = d + ' of ' + n + ' steps done';
+    links.forEach(function(a){ a.classList.toggle('done', !!done[a.dataset.id]); });
+  }
+
+  var i = 0;
+  document.querySelectorAll('.phase, section.step').forEach(function(el){
+    if(el.classList.contains('phase')){
+      var h = document.createElement('h4');
+      h.textContent = el.querySelector('.phase-label').textContent + ' · ' + el.querySelector('h2').textContent;
+      tocLinks.appendChild(h);
+      return;
+    }
+    i++;
+    el.id = 'step-' + i;
+    var head = document.createElement('div'); head.className = 'step-head';
+    head.innerHTML = '<span class="step-num">' + i + '</span><div class="title"><h2></h2></div>' +
+      '<label class="check"><input type="checkbox"> Done</label>';
+    head.querySelector('h2').textContent = el.dataset.step;
+    el.insertBefore(head, el.firstChild);
+    var cb = head.querySelector('input');
+    cb.checked = !!done[el.id];
+    cb.onchange = function(){ done[el.id] = cb.checked; store('kiosk-fe-guide-done', JSON.stringify(done)); updateProgress(); };
+
+    var a = document.createElement('a');
+    a.href = '#' + el.id; a.dataset.id = el.id;
+    a.innerHTML = '<span class="n">' + i + '</span><span></span>';
+    a.lastChild.textContent = el.dataset.step;
+    a.onclick = function(){ document.getElementById('toc').classList.remove('open'); };
+    tocLinks.appendChild(a); links.push(a);
+  });
+  updateProgress();
+
+  document.getElementById('menuBtn').onclick = function(){ document.getElementById('toc').classList.toggle('open'); };
+})();
+</script>
+</body>
+</html>

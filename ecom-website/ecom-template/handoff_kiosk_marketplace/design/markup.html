@@ -1,0 +1,463 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Kiosk — design reference</title></head>
+<body>
+<!-- Design reference: inline-styled markup extracted from the approved design.
+     Template syntax to translate:
+       {{ x }}                        -> JSX {x}
+       <sc-for list="{{ a }}" as="b"> -> a.map(b => ...)
+       <sc-if value="{{ c }}">        -> a route, or {c && ...} for a UI state
+       style-hover="..."              -> Tailwind hover: utilities (same values)
+       onClick="{{ fn }}"             -> <Link> or handler
+-->
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #F7F6F3; }
+  a { color: #131316; }
+  a:hover { color: #3B5BFF; }
+  ::selection { background: rgba(59,91,255,0.16); color: #131316; }
+  ::placeholder { color: #A3A3AC; }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F7F6F3; color: #131316; font-family: 'Instrument Sans', sans-serif; display: flex; flex-direction: column; overflow-x: hidden;">
+
+  <header style="position: sticky; top: 0; z-index: 30; background: rgba(247,246,243,0.78); backdrop-filter: blur(20px) saturate(1.4); border-bottom: 1px solid rgba(19,19,22,0.07);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 14px 32px; display: flex; align-items: center; gap: 20px;">
+      <a href="#" onClick="{{ goBrowse }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #131316; flex-shrink: 0;">
+        <span style="width: 30px; height: 30px; border-radius: 9px; background: #131316; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #F7F6F3;">K</span>
+        <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.03em;">Kiosk</span>
+      </a>
+      <form onSubmit="{{ search }}" style="flex: 1; display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.08); border-radius: 14px; padding: 6px 6px 6px 14px; max-width: 520px; box-shadow: 0 1px 2px rgba(19,19,22,0.04);">
+        <span style="font-size: 14px; color: #A3A3AC;">⌕</span>
+        <input type="text" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search cars, laptops, rentals…" style="flex: 1; min-width: 0; font-family: 'Instrument Sans', sans-serif; font-size: 15px; color: #131316; background: transparent; border: none; outline: none;" />
+        <button type="submit" style="font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; background: #131316; border: none; border-radius: 10px; padding: 8px 16px; cursor: pointer; flex-shrink: 0; transition: background 160ms;" style-hover="background: #3B5BFF">Search</button>
+      </form>
+      <nav style="display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0;">
+        <a href="#" onClick="{{ goDash }}" style="font-size: 14px; font-weight: 500; text-decoration: none; padding: 8px 13px; border-radius: 10px; transition: all 160ms; color: {{ dashColor }}; background: {{ dashBg }};" style-hover="color: #131316">My listings</a>
+        <a href="#" onClick="{{ goSignin }}" style="font-size: 14px; font-weight: 500; text-decoration: none; padding: 8px 13px; border-radius: 10px; transition: all 160ms; color: {{ authColor }}; background: {{ authBg }};" style-hover="color: #131316">Sign in</a>
+        <a href="#" onClick="{{ goPost }}" style="margin-left: 6px; font-size: 14px; font-weight: 600; text-decoration: none; padding: 10px 18px; border-radius: 12px; color: #FFFFFF; background: #3B5BFF; box-shadow: 0 1px 2px rgba(19,19,22,0.08), 0 8px 20px -10px rgba(59,91,255,0.7); transition: all 180ms;" style-hover="transform: translateY(-1px); box-shadow: 0 2px 4px rgba(19,19,22,0.1), 0 12px 26px -10px rgba(59,91,255,0.8)">Post a listing</a>
+      </nav>
+    </div>
+    <sc-if value="{{ showCats }}" hint-placeholder-val="{{ true }}">
+      <div style="border-top: 1px solid rgba(19,19,22,0.05);">
+        <div style="max-width: 1280px; margin: 0 auto; padding: 9px 32px; display: flex; gap: 6px; flex-wrap: wrap;">
+          <sc-for list="{{ cats }}" as="cat" hint-placeholder-count="7">
+            <a href="#" onClick="{{ cat.open }}" style="text-decoration: none; font-size: 13px; font-weight: 500; padding: 6px 13px; border-radius: 999px; transition: all 160ms; color: {{ cat.color }}; background: {{ cat.bg }}; border: 1px solid {{ cat.border }};" style-hover="color: #131316">{{ cat.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </header>
+
+  <main style="flex: 1;">
+
+    <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <section style="max-width: 1280px; margin: 0 auto; padding: 56px 32px 40px;">
+          <div style="display: grid; grid-template-columns: minmax(0,1.45fr) minmax(0,1fr); gap: 48px; align-items: end;">
+            <div>
+              <p style="margin: 0 0 18px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.08); border-radius: 999px; font-size: 13px; color: #55555F; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #3B5BFF; box-shadow: 0 0 0 3px rgba(59,91,255,0.18);"></span>
+                4,812 listings posted this week
+              </p>
+              <h1 style="margin: 0 0 20px; max-width: 17ch; font-size: 76px; line-height: 0.98; font-weight: 600; letter-spacing: -0.052em; text-wrap: pretty;">Buy and sell anything nearby.</h1>
+              <p style="margin: 0 0 30px; max-width: 50ch; font-size: 18px; line-height: 1.6; color: #55555F;">Post a listing in under a minute. Cars, electronics, rentals, jobs — you talk to the seller directly, and nothing goes through us.</p>
+              <div style="display: flex; gap: 10px;">
+                <a href="#" onClick="{{ goPost }}" style="font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 26px; border-radius: 14px; color: #FFFFFF; background: #131316; box-shadow: 0 1px 2px rgba(19,19,22,0.1), 0 12px 24px -12px rgba(19,19,22,0.5); transition: all 180ms;" style-hover="transform: translateY(-1px)">Post a listing</a>
+                <a href="#" onClick="{{ goResults }}" style="font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 26px; border-radius: 14px; color: #131316; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.08); box-shadow: 0 1px 2px rgba(19,19,22,0.04); transition: all 180ms;" style-hover="transform: translateY(-1px)">Browse everything</a>
+              </div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 22px; padding: 24px 26px; box-shadow: 0 1px 2px rgba(19,19,22,0.04), 0 20px 40px -24px rgba(19,19,22,0.18);">
+              <p style="margin: 0 0 16px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A93;">How Kiosk works</p>
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <sc-for list="{{ steps }}" as="step" hint-placeholder-count="3">
+                  <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <span style="width: 22px; height: 22px; border-radius: 7px; background: rgba(59,91,255,0.1); color: #3B5BFF; font-family: 'DM Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">{{ step.n }}</span>
+                    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #35353D;">{{ step.text }}</p>
+                  </div>
+                </sc-for>
+              </div>
+              <p style="margin: 18px 0 0; padding-top: 16px; border-top: 1px solid rgba(19,19,22,0.07); font-size: 13px; line-height: 1.55; color: #8A8A93;">Kiosk never handles payments. Meet in a public place and check the item yourself.</p>
+            </div>
+          </div>
+        </section>
+
+        <section style="max-width: 1280px; margin: 0 auto; padding: 0 32px 8px;">
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px;">
+            <sc-for list="{{ tiles }}" as="tile" hint-placeholder-count="4">
+              <a href="#" onClick="{{ tile.open }}" style="text-decoration: none; color: #131316; display: flex; align-items: center; gap: 13px; padding: 15px 17px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 18px; box-shadow: 0 1px 2px rgba(19,19,22,0.03); transition: all 180ms;" style-hover="transform: translateY(-2px); box-shadow: 0 2px 4px rgba(19,19,22,0.05), 0 16px 30px -18px rgba(19,19,22,0.28)">
+                <span style="width: 38px; height: 38px; border-radius: 12px; background: {{ tile.tint }}; display: flex; align-items: center; justify-content: center; font-size: 16px; color: {{ tile.ink }}; flex-shrink: 0;">{{ tile.glyph }}</span>
+                <div style="min-width: 0;">
+                  <p style="margin: 0 0 2px; font-size: 15px; font-weight: 600; letter-spacing: -0.015em;">{{ tile.label }}</p>
+                  <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 12px; color: #8A8A93;">{{ tile.count }} live</p>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="max-width: 1280px; margin: 0 auto; padding: 40px 32px 88px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.035em;">Fresh today</h2>
+            <a href="#" onClick="{{ goResults }}" style="font-size: 14px; font-weight: 600; text-decoration: none; color: #3B5BFF;">See all listings</a>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px;">
+            <sc-for list="{{ featured }}" as="item" hint-placeholder-count="8">
+              <a href="#" onClick="{{ item.open }}" style="text-decoration: none; color: #131316; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px; padding: 8px; box-shadow: 0 1px 2px rgba(19,19,22,0.03); transition: all 200ms;" style-hover="transform: translateY(-3px); box-shadow: 0 2px 4px rgba(19,19,22,0.05), 0 22px 40px -22px rgba(19,19,22,0.3)">
+                <div style="position: relative; aspect-ratio: 4/3; border-radius: 14px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC); overflow: hidden;">
+                  <span style="position: absolute; top: 9px; left: 9px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.86); backdrop-filter: blur(8px); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #35353D;">{{ item.cat }}</span>
+                </div>
+                <div style="padding: 14px 10px 10px; display: flex; flex-direction: column; flex: 1;">
+                  <p style="margin: 0 0 6px; font-size: 21px; font-weight: 600; letter-spacing: -0.035em; font-variant-numeric: tabular-nums;">{{ item.price }}</p>
+                  <h3 style="margin: 0 0 14px; font-size: 14px; line-height: 1.45; font-weight: 400; color: #55555F;">{{ item.title }}</h3>
+                  <p style="margin: auto 0 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: #A3A3AC;">{{ item.place }} · {{ item.time }}</p>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width: 1280px; margin: 0 auto; padding: 40px 32px 88px;">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 24px;">
+          <div>
+            <p style="margin: 0 0 12px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8A8A93;">{{ activeCat }}</p>
+            <h1 style="margin: 0 0 8px; font-size: 46px; line-height: 1.02; font-weight: 600; letter-spacing: -0.045em;">{{ resultsTitle }}</h1>
+            <p style="margin: 0; font-size: 15px; color: #55555F;">{{ resultCount }} listings · within 25 km of Pune</p>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; padding: 4px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 999px; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+            <sc-for list="{{ sorts }}" as="sort" hint-placeholder-count="3">
+              <a href="#" onClick="{{ sort.pick }}" style="text-decoration: none; font-size: 13px; font-weight: 500; padding: 7px 15px; border-radius: 999px; transition: all 160ms; color: {{ sort.tabColor }}; background: {{ sort.tabBg }}; box-shadow: {{ sort.tabShadow }};">{{ sort.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px;">
+          <sc-for list="{{ results }}" as="item" hint-placeholder-count="8">
+            <a href="#" onClick="{{ item.open }}" style="text-decoration: none; color: #131316; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px; padding: 8px; box-shadow: 0 1px 2px rgba(19,19,22,0.03); transition: all 200ms;" style-hover="transform: translateY(-3px); box-shadow: 0 2px 4px rgba(19,19,22,0.05), 0 22px 40px -22px rgba(19,19,22,0.3)">
+              <div style="position: relative; aspect-ratio: 4/3; border-radius: 14px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC); overflow: hidden;">
+                <span style="position: absolute; top: 9px; left: 9px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.86); backdrop-filter: blur(8px); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #35353D;">{{ item.cat }}</span>
+              </div>
+              <div style="padding: 14px 10px 10px; display: flex; flex-direction: column; flex: 1;">
+                <p style="margin: 0 0 6px; font-size: 21px; font-weight: 600; letter-spacing: -0.035em; font-variant-numeric: tabular-nums;">{{ item.price }}</p>
+                <h3 style="margin: 0 0 14px; font-size: 14px; line-height: 1.45; font-weight: 400; color: #55555F;">{{ item.title }}</h3>
+                <p style="margin: auto 0 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: #A3A3AC;">{{ item.place }} · {{ item.time }}</p>
+              </div>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width: 1280px; margin: 0 auto; padding: 26px 32px 88px;">
+        <a href="#" onClick="{{ goResults }}" style="display: inline-block; margin-bottom: 20px; font-size: 13px; font-weight: 600; text-decoration: none; padding: 8px 14px; border-radius: 10px; color: #55555F; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07);" style-hover="color: #131316">← Back to results</a>
+        <div style="display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); gap: 32px; align-items: start;">
+          <div>
+            <div style="aspect-ratio: 16/10; border-radius: 24px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC); border: 1px solid rgba(19,19,22,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 28px;">
+              <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #A3A3AC;">Listing photo</p>
+            </div>
+            <span style="display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px; background: rgba(59,91,255,0.1); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #3B5BFF;">{{ current.cat }}</span>
+            <h1 style="margin: 0 0 12px; font-size: 40px; line-height: 1.06; font-weight: 600; letter-spacing: -0.045em; text-wrap: pretty;">{{ current.title }}</h1>
+            <p style="margin: 0 0 32px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #8A8A93;">Posted {{ current.time }} · {{ current.place }} · {{ current.views }} views</p>
+            <h2 style="margin: 0 0 12px; font-size: 19px; font-weight: 600; letter-spacing: -0.025em;">Description</h2>
+            <p style="margin: 0 0 34px; font-size: 17px; line-height: 1.72; color: #35353D; max-width: 62ch;">{{ current.body }}</p>
+            <h2 style="margin: 0 0 14px; font-size: 19px; font-weight: 600; letter-spacing: -0.025em;">Details</h2>
+            <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px; overflow: hidden; max-width: 580px; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+              <dl style="margin: 0; display: grid; grid-template-columns: 200px minmax(0,1fr); gap: 0;">
+                <sc-for list="{{ current.specs }}" as="spec" hint-placeholder-count="4">
+                  <div style="display: contents;">
+                    <dt style="margin: 0; padding: 13px 20px; border-bottom: 1px solid rgba(19,19,22,0.06); font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #8A8A93;">{{ spec.k }}</dt>
+                    <dd style="margin: 0; padding: 13px 20px; border-bottom: 1px solid rgba(19,19,22,0.06); font-size: 15px; font-weight: 500;">{{ spec.v }}</dd>
+                  </div>
+                </sc-for>
+              </dl>
+            </div>
+          </div>
+          <aside style="position: sticky; top: 132px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 24px; padding: 24px; box-shadow: 0 1px 2px rgba(19,19,22,0.04), 0 24px 48px -28px rgba(19,19,22,0.24);">
+              <p style="margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A93;">Asking price</p>
+              <p style="margin: 0 0 22px; font-size: 38px; line-height: 1; font-weight: 600; letter-spacing: -0.045em; font-variant-numeric: tabular-nums;">{{ current.price }}</p>
+              <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid rgba(19,19,22,0.07);">
+                <span style="width: 42px; height: 42px; border-radius: 14px; background: #F0EFEB; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0;">{{ current.initial }}</span>
+                <div style="min-width: 0;">
+                  <p style="margin: 0 0 2px; font-size: 15px; font-weight: 600;">{{ current.seller }}</p>
+                  <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 12px; color: #8A8A93;">Member since {{ current.since }}</p>
+                </div>
+              </div>
+              <sc-if value="{{ phoneHidden }}" hint-placeholder-val="{{ true }}">
+                <button type="button" onClick="{{ revealPhone }}" style="width: 100%; font-family: 'Instrument Sans', sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #3B5BFF; border: none; border-radius: 14px; padding: 14px 20px; cursor: pointer; box-shadow: 0 1px 2px rgba(19,19,22,0.08), 0 10px 22px -12px rgba(59,91,255,0.8); transition: all 180ms;" style-hover="transform: translateY(-1px)">Show phone number</button>
+              </sc-if>
+              <sc-if value="{{ phoneShown }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 13px 18px; border-radius: 14px; background: rgba(59,91,255,0.07); border: 1px solid rgba(59,91,255,0.2); text-align: center;">
+                  <p style="margin: 0 0 3px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #2D49E0;">Seller's number</p>
+                  <p style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: #2D49E0; font-variant-numeric: tabular-nums;">{{ current.phone }}</p>
+                </div>
+              </sc-if>
+              <button type="button" style="width: 100%; margin-top: 9px; font-family: 'Instrument Sans', sans-serif; font-size: 15px; font-weight: 600; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.07); border-radius: 14px; padding: 13px 20px; cursor: pointer; transition: background 160ms;" style-hover="background: #F0EFEB">Message seller</button>
+            </div>
+            <div style="padding: 18px 20px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px;">
+              <p style="margin: 0 0 9px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A93;">Before you pay</p>
+              <p style="margin: 0; font-size: 14px; line-height: 1.65; color: #55555F;">Meet in a public place, check the item yourself, and never send a deposit before you have seen it. Kiosk never handles payments.</p>
+            </div>
+          </aside>
+        </div>
+        <div style="margin-top: 68px;">
+          <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; letter-spacing: -0.035em;">Similar listings</h2>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px;">
+            <sc-for list="{{ similar }}" as="item" hint-placeholder-count="4">
+              <a href="#" onClick="{{ item.open }}" style="text-decoration: none; color: #131316; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px; padding: 8px; box-shadow: 0 1px 2px rgba(19,19,22,0.03); transition: all 200ms;" style-hover="transform: translateY(-3px); box-shadow: 0 2px 4px rgba(19,19,22,0.05), 0 22px 40px -22px rgba(19,19,22,0.3)">
+                <div style="aspect-ratio: 4/3; border-radius: 14px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC);"></div>
+                <div style="padding: 14px 10px 10px;">
+                  <p style="margin: 0 0 6px; font-size: 20px; font-weight: 600; letter-spacing: -0.035em; font-variant-numeric: tabular-nums;">{{ item.price }}</p>
+                  <h3 style="margin: 0 0 14px; font-size: 14px; line-height: 1.45; font-weight: 400; color: #55555F;">{{ item.title }}</h3>
+                  <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: #A3A3AC;">{{ item.place }} · {{ item.time }}</p>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ false }}">
+      <section style="display: flex; justify-content: center;">
+        <div style="width: 100%; max-width: 440px; padding: 64px 32px 104px;">
+          <div style="text-align: center; margin-bottom: 26px;">
+            <h1 style="margin: 0 0 10px; font-size: 40px; line-height: 1.04; font-weight: 600; letter-spacing: -0.045em;">Welcome back</h1>
+            <p style="margin: 0; font-size: 16px; color: #55555F;">Sign in to manage your listings.</p>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 26px; padding: 30px; box-shadow: 0 1px 2px rgba(19,19,22,0.04), 0 30px 60px -30px rgba(19,19,22,0.26);">
+            <form onSubmit="{{ authSubmit }}" style="display: flex; flex-direction: column; gap: 16px;">
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Email
+                <input type="email" value="{{ email }}" onChange="{{ setEmail }}" placeholder="you@example.com" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Password
+                <input type="password" value="{{ password }}" onChange="{{ setPassword }}" placeholder="••••••••" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #55555F;">
+                  <input type="checkbox" checked="{{ remember }}" onChange="{{ toggleRemember }}" style="width: 16px; height: 16px; accent-color: #3B5BFF;" />
+                  Keep me signed in
+                </label>
+                <a href="#" onClick="{{ noop }}" style="font-size: 14px; font-weight: 500; text-decoration: none; color: #3B5BFF;">Forgot password?</a>
+              </div>
+              <button type="submit" style="margin-top: 4px; font-family: 'Instrument Sans', sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #131316; border: none; border-radius: 14px; padding: 15px 28px; cursor: pointer; box-shadow: 0 1px 2px rgba(19,19,22,0.1), 0 12px 24px -14px rgba(19,19,22,0.6); transition: all 180ms;" style-hover="transform: translateY(-1px)">Sign in</button>
+            </form>
+            <p style="margin: 20px 0 0; text-align: center; font-size: 14px; color: #55555F;">New to Kiosk? <a href="#" onClick="{{ goSignup }}" style="text-decoration: none; font-weight: 600; color: #3B5BFF;">Create an account</a></p>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+      <section style="display: flex; justify-content: center;">
+        <div style="width: 100%; max-width: 440px; padding: 56px 32px 104px;">
+          <div style="text-align: center; margin-bottom: 26px;">
+            <h1 style="margin: 0 0 10px; font-size: 40px; line-height: 1.04; font-weight: 600; letter-spacing: -0.045em;">Create your account</h1>
+            <p style="margin: 0; font-size: 16px; color: #55555F;">Free, and takes about thirty seconds.</p>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 26px; padding: 30px; box-shadow: 0 1px 2px rgba(19,19,22,0.04), 0 30px 60px -30px rgba(19,19,22,0.26);">
+            <form onSubmit="{{ authSubmit }}" style="display: flex; flex-direction: column; gap: 16px;">
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Full name
+                <input type="text" value="{{ name }}" onChange="{{ setName }}" placeholder="Your name" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Email
+                <input type="email" value="{{ email }}" onChange="{{ setEmail }}" placeholder="you@example.com" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Phone
+                <input type="tel" value="{{ phone }}" onChange="{{ setPhone }}" placeholder="+91 98765 43210" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Password
+                <input type="password" value="{{ password }}" onChange="{{ setPassword }}" placeholder="At least 8 characters" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+              </label>
+              <button type="submit" style="margin-top: 4px; font-family: 'Instrument Sans', sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #131316; border: none; border-radius: 14px; padding: 15px 28px; cursor: pointer; box-shadow: 0 1px 2px rgba(19,19,22,0.1), 0 12px 24px -14px rgba(19,19,22,0.6); transition: all 180ms;" style-hover="transform: translateY(-1px)">Create account</button>
+              <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #8A8A93;">By creating an account you agree to the terms and the listing rules.</p>
+            </form>
+            <p style="margin: 18px 0 0; text-align: center; font-size: 14px; color: #55555F;">Already have an account? <a href="#" onClick="{{ goSignin }}" style="text-decoration: none; font-weight: 600; color: #3B5BFF;">Sign in</a></p>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isPost }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 88px;">
+        <sc-if value="{{ posted }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width: 520px; margin: 0 auto; text-align: center; padding: 30px 0 60px;">
+            <span style="display: inline-flex; width: 56px; height: 56px; border-radius: 18px; margin-bottom: 22px; background: #3B5BFF; align-items: center; justify-content: center; font-size: 24px; color: #FFFFFF; box-shadow: 0 1px 2px rgba(19,19,22,0.1), 0 16px 32px -16px rgba(59,91,255,0.9);">✓</span>
+            <h1 style="margin: 0 0 12px; font-size: 34px; line-height: 1.06; font-weight: 600; letter-spacing: -0.045em;">Your listing is live</h1>
+            <p style="margin: 0 0 28px; font-size: 17px; line-height: 1.65; color: #55555F;">It will appear in search within a few minutes. You can edit or pause it any time from My listings.</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+              <a href="#" onClick="{{ goDash }}" style="font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 26px; border-radius: 14px; color: #FFFFFF; background: #131316; box-shadow: 0 1px 2px rgba(19,19,22,0.1), 0 12px 24px -14px rgba(19,19,22,0.6);">Go to my listings</a>
+              <a href="#" onClick="{{ resetPost }}" style="font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 26px; border-radius: 14px; color: #131316; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.08);" style-hover="background: #F0EFEB">Post another</a>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notPosted }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="margin-bottom: 28px;">
+              <p style="margin: 0 0 12px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8A8A93;">New listing</p>
+              <h1 style="margin: 0 0 10px; font-size: 50px; line-height: 1; font-weight: 600; letter-spacing: -0.05em;">What are you selling?</h1>
+              <p style="margin: 0; font-size: 17px; color: #55555F;">A clear title, a real price and one honest photo get replies faster than anything else.</p>
+            </div>
+            <form onSubmit="{{ postSubmit }}" style="display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 26px; align-items: start;">
+              <div style="display: flex; flex-direction: column; gap: 22px; padding: 28px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 26px; box-shadow: 0 1px 2px rgba(19,19,22,0.04), 0 24px 48px -30px rgba(19,19,22,0.2);">
+                <div>
+                  <p style="margin: 0 0 10px; font-size: 13px; font-weight: 500; color: #35353D;">Category</p>
+                  <div style="display: flex; gap: 7px; flex-wrap: wrap;">
+                    <sc-for list="{{ formCats }}" as="c" hint-placeholder-count="6">
+                      <button type="button" onClick="{{ c.pick }}" style="font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: all 160ms; color: {{ c.color }}; background: {{ c.bg }}; border: 1px solid {{ c.border }};">{{ c.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Title
+                  <input type="text" value="{{ fTitle }}" onChange="{{ setFTitle }}" placeholder="e.g. 2019 Maruti Swift VXi, single owner" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px;">
+                  <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Price (₹)
+                    <input type="text" value="{{ fPrice }}" onChange="{{ setFPrice }}" placeholder="4,80,000" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+                  </label>
+                  <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Location
+                    <input type="text" value="{{ fPlace }}" onChange="{{ setFPlace }}" placeholder="Kothrud, Pune" style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF" />
+                  </label>
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #35353D;">Description
+                  <textarea rows="6" value="{{ fBody }}" onChange="{{ setFBody }}" placeholder="Condition, age, what's included, why you're selling. Mention anything a buyer would notice in person." style="font-family: 'Instrument Sans', sans-serif; font-size: 16px; line-height: 1.6; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.08); border-radius: 13px; padding: 13px 15px; outline: none; resize: vertical; transition: all 160ms;" style-focus="background: #FFFFFF; border-color: #3B5BFF"></textarea>
+                </label>
+                <div>
+                  <p style="margin: 0 0 10px; font-size: 13px; font-weight: 500; color: #35353D;">Photos</p>
+                  <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;">
+                    <div style="aspect-ratio: 1; border-radius: 16px; background: rgba(59,91,255,0.05); border: 1px dashed rgba(59,91,255,0.42); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer;">
+                      <span style="font-size: 20px; color: #3B5BFF;">+</span>
+                      <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7FFF;">Add</span>
+                    </div>
+                    <div style="aspect-ratio: 1; border-radius: 16px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC);"></div>
+                    <div style="aspect-ratio: 1; border-radius: 16px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC);"></div>
+                    <div style="aspect-ratio: 1; border-radius: 16px; background: transparent; border: 1px dashed rgba(19,19,22,0.14);"></div>
+                  </div>
+                </div>
+                <button type="submit" style="align-self: start; font-family: 'Instrument Sans', sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #3B5BFF; border: none; border-radius: 14px; padding: 15px 30px; cursor: pointer; box-shadow: 0 1px 2px rgba(19,19,22,0.08), 0 14px 28px -14px rgba(59,91,255,0.9); transition: all 180ms;" style-hover="transform: translateY(-1px)">Publish listing</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 14px; position: sticky; top: 132px;">
+                <div style="padding: 20px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 24px; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+                  <p style="margin: 0 0 14px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A93;">Live preview</p>
+                  <div style="border-radius: 18px; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.06); padding: 8px;">
+                    <div style="aspect-ratio: 4/3; border-radius: 13px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC);"></div>
+                    <div style="padding: 13px 10px 8px;">
+                      <p style="margin: 0 0 6px; font-size: 21px; font-weight: 600; letter-spacing: -0.035em; font-variant-numeric: tabular-nums;">{{ previewPrice }}</p>
+                      <h3 style="margin: 0 0 12px; font-size: 14px; line-height: 1.45; font-weight: 400; color: #55555F;">{{ previewTitle }}</h3>
+                      <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: #A3A3AC;">{{ previewPlace }} · just now</p>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding: 20px 22px; background: rgba(59,91,255,0.05); border: 1px solid rgba(59,91,255,0.16); border-radius: 22px;">
+                  <p style="margin: 0 0 12px; font-size: 15px; font-weight: 600; letter-spacing: -0.02em;">Listings that sell fast</p>
+                  <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #35353D;">Name the exact model and year in the title.</p>
+                  <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #35353D;">Photograph the item where it is, in daylight.</p>
+                  <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #35353D;">Say what is wrong with it. Buyers trust that.</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width: 1280px; margin: 0 auto; padding: 44px 32px 88px;">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 26px;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="width: 54px; height: 54px; border-radius: 18px; background: #131316; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; color: #F7F6F3; flex-shrink: 0;">R</span>
+            <div>
+              <h1 style="margin: 0 0 3px; font-size: 34px; line-height: 1.04; font-weight: 600; letter-spacing: -0.045em;">Rohan Kulkarni</h1>
+              <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #8A8A93;">Member since 2023 · Pune</p>
+            </div>
+          </div>
+          <a href="#" onClick="{{ goPost }}" style="font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 20px; border-radius: 12px; color: #FFFFFF; background: #3B5BFF; box-shadow: 0 1px 2px rgba(19,19,22,0.08), 0 10px 22px -12px rgba(59,91,255,0.8); transition: all 180ms;" style-hover="transform: translateY(-1px)">Post a listing</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 30px;">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="padding: 20px 22px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 20px; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+              <p style="margin: 0 0 4px; font-size: 32px; line-height: 1; font-weight: 600; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; color: {{ s.tone }};">{{ s.value }}</p>
+              <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A8A93;">{{ s.label }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: inline-flex; gap: 6px; margin-bottom: 16px; padding: 4px; background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 999px; box-shadow: 0 1px 2px rgba(19,19,22,0.03);">
+          <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+            <a href="#" onClick="{{ tab.pick }}" style="text-decoration: none; font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; transition: all 160ms; color: {{ tab.tabColor }}; background: {{ tab.tabBg }}; box-shadow: {{ tab.tabShadow }};">{{ tab.label }}</a>
+          </sc-for>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(19,19,22,0.07); border-radius: 24px; overflow: hidden; box-shadow: 0 1px 2px rgba(19,19,22,0.03), 0 24px 48px -32px rgba(19,19,22,0.18);">
+          <div style="display: grid; grid-template-columns: 84px minmax(0,1fr) 130px 100px 110px 84px; gap: 20px; align-items: center; padding: 13px 22px; border-bottom: 1px solid rgba(19,19,22,0.07); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8A93;">
+            <p style="margin: 0;">Photo</p>
+            <p style="margin: 0;">Listing</p>
+            <p style="margin: 0;">Price</p>
+            <p style="margin: 0;">Views</p>
+            <p style="margin: 0;">Status</p>
+            <p style="margin: 0; text-align: right;">Action</p>
+          </div>
+          <sc-for list="{{ mine }}" as="row" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: 84px minmax(0,1fr) 130px 100px 110px 84px; gap: 20px; align-items: center; padding: 14px 22px; border-bottom: 1px solid rgba(19,19,22,0.05); transition: background 160ms;" style-hover="background: #FAFAF8">
+              <div style="aspect-ratio: 4/3; border-radius: 11px; background: linear-gradient(160deg, #EFEDE8, #E4E2DC);"></div>
+              <div style="min-width: 0;">
+                <a href="#" onClick="{{ row.open }}" style="text-decoration: none; color: #131316;" style-hover="color: #3B5BFF">
+                  <p style="margin: 0 0 3px; font-size: 15px; font-weight: 500; letter-spacing: -0.015em;">{{ row.title }}</p>
+                </a>
+                <p style="margin: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: #A3A3AC;">{{ row.cat }} · posted {{ row.time }}</p>
+              </div>
+              <p style="margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;">{{ row.price }}</p>
+              <p style="margin: 0; font-size: 15px; color: #55555F; font-variant-numeric: tabular-nums;">{{ row.views }}</p>
+              <span style="justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; color: {{ row.statusInk }}; background: {{ row.statusBg }};">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ row.statusDot }};"></span>
+                {{ row.status }}
+              </span>
+              <a href="#" onClick="{{ noop }}" style="justify-self: end; font-size: 13px; font-weight: 600; text-decoration: none; padding: 7px 14px; border-radius: 10px; color: #131316; background: #F7F6F3; border: 1px solid rgba(19,19,22,0.07);" style-hover="background: #F0EFEB">Edit</a>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+  </main>
+
+  <footer style="border-top: 1px solid rgba(19,19,22,0.07); background: #FFFFFF;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 44px 32px 28px; display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); gap: 40px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 13px;">
+          <span style="width: 28px; height: 28px; border-radius: 9px; background: #131316; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #F7F6F3;">K</span>
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em;">Kiosk</span>
+        </div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; max-width: 34ch; color: #8A8A93;">A classifieds board for your city. Buyers and sellers talk directly.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #A3A3AC;">Browse</p>
+        <a href="#" onClick="{{ goResults }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Cars</a>
+        <a href="#" onClick="{{ goResults }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Electronics</a>
+        <a href="#" onClick="{{ goResults }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Rentals</a>
+        <a href="#" onClick="{{ goResults }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Jobs</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #A3A3AC;">Account</p>
+        <a href="#" onClick="{{ goSignin }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Sign in</a>
+        <a href="#" onClick="{{ goSignup }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Create account</a>
+        <a href="#" onClick="{{ goDash }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">My listings</a>
+        <a href="#" onClick="{{ goPost }}" style="font-size: 15px; text-decoration: none; color: #35353D;" style-hover="color: #3B5BFF">Post a listing</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #A3A3AC;">Help</p>
+        <p style="margin: 0; font-size: 15px; color: #35353D;">Safety tips</p>
+        <p style="margin: 0; font-size: 15px; color: #35353D;">Listing rules</p>
+        <p style="margin: 0; font-size: 15px; color: #35353D;">Report a listing</p>
+      </div>
+    </div>
+    <div style="max-width: 1280px; margin: 0 auto; padding: 16px 32px 28px; border-top: 1px solid rgba(19,19,22,0.06); display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 12px; color: #A3A3AC;">
+      <p style="margin: 0;">© 2026 Kiosk</p>
+      <p style="margin: 0;">Kiosk never handles payments</p>
+    </div>
+  </footer>
+</div>
+</body></html>

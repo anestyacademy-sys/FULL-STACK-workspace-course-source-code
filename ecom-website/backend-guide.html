@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosk Backend Guide</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1d1b; --muted:#6b6a64; --border:#e3e1d9;
+  --accent:#0f766e; --accent-soft:#e0f2ef; --warn:#b45309; --warn-soft:#fdf3e2;
+  --ok:#15803d; --ok-soft:#e5f5ea; --code-bg:#161b22; --inline-bg:#efede6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121311; --surface:#1b1c1a; --text:#e9e8e3; --muted:#9d9b93; --border:#2e2f2b;
+    --accent:#2dd4bf; --accent-soft:#12302c; --warn:#fbbf24; --warn-soft:#33270f;
+    --ok:#4ade80; --ok-soft:#10291a; --code-bg:#0d1117; --inline-bg:#2a2b27;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121311; --surface:#1b1c1a; --text:#e9e8e3; --muted:#9d9b93; --border:#2e2f2b;
+  --accent:#2dd4bf; --accent-soft:#12302c; --warn:#fbbf24; --warn-soft:#33270f;
+  --ok:#4ade80; --ok-soft:#10291a; --code-bg:#0d1117; --inline-bg:#2a2b27;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1240px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px 40px;border-right:1px solid var(--border)}
+nav.toc .brand{font-weight:700;font-size:18px;margin-bottom:4px}
+nav.toc .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+nav.toc .progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px}
+nav.toc .progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+nav.toc .ptext{font-size:12px;color:var(--muted);margin-bottom:18px}
+nav.toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 6px}
+nav.toc a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--text);font-size:14px;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--accent-soft)}
+nav.toc a .n{color:var(--muted);font-variant-numeric:tabular-nums;min-width:20px;font-size:12px}
+nav.toc a.done{color:var(--muted);text-decoration:line-through}
+main{padding:40px 48px 120px;min-width:0}
+header.hero h1{font-size:38px;line-height:1.15;margin:0 0 12px}
+header.hero p{color:var(--muted);font-size:18px;max-width:720px;margin:0 0 8px}
+.theme-btn{float:right;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+h2{font-size:26px;margin:0 0 6px}
+h3{font-size:18px;margin:28px 0 8px}
+.phase{margin-top:64px;padding-top:12px;border-top:2px solid var(--text)}
+.phase-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+section.step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin:22px 0}
+.step-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;flex:none}
+.step-head .title{flex:1}
+.step-head h2{font-size:22px;margin:3px 0 0}
+label.check{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;cursor:pointer;white-space:nowrap;padding-top:6px}
+.lead{color:var(--muted);margin:4px 0 14px}
+code{font-family:"Cascadia Code",Consolas,"JetBrains Mono",monospace;font-size:.88em}
+:not(pre)>code{background:var(--inline-bg);padding:2px 6px;border-radius:5px}
+.codeblock{margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid #30363d;background:var(--code-bg)}
+.codeblock .bar{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#21262d;color:#c9d1d9;font:12px/1.4 Consolas,monospace}
+.codeblock .bar button{background:#30363d;border:0;color:#c9d1d9;border-radius:5px;padding:3px 9px;cursor:pointer;font-size:12px}
+.codeblock .bar button:hover{background:#3d444d}
+.codeblock pre{margin:0;padding:14px 16px;overflow-x:auto;color:#e6edf3}
+.codeblock pre code.hljs{padding:0;background:transparent}
+.note,.warn,.ok{border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
+.note{background:var(--accent-soft);border-left:4px solid var(--accent)}
+.warn{background:var(--warn-soft);border-left:4px solid var(--warn)}
+.ok{background:var(--ok-soft);border-left:4px solid var(--ok)}
+.note b:first-child,.warn b:first-child,.ok b:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:14px 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--inline-bg)}
+.m{font-weight:700;font-family:Consolas,monospace;font-size:12px;padding:2px 6px;border-radius:4px;color:#fff}
+.GET{background:#2563eb}.POST{background:#16a34a}.PUT{background:#d97706}.DELETE{background:#dc2626}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0}
+.flow .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;text-align:center}
+.flow .box b{display:block}
+.flow .box small{color:var(--muted)}
+.flow .arrow{color:var(--muted);font-size:20px}
+.tree{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font:14px/1.6 Consolas,monospace;white-space:pre;overflow-x:auto}
+.tree i{color:var(--muted);font-style:normal}
+ul.clean{padding-left:20px}
+ul.clean li{margin:4px 0}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;inset:0 auto 0 0;width:280px;background:var(--bg);z-index:10;transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 30px rgba(0,0,0,.25)}
+  nav.toc.open{transform:none}
+  .menu-btn{display:block;position:fixed;bottom:18px;right:18px;z-index:11;background:var(--accent);color:var(--surface);border:0;border-radius:99px;padding:12px 18px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  main{padding:24px 16px 100px}
+  header.hero h1{font-size:28px}
+  section.step{padding:18px 16px}
+  .step-head{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" id="toc">
+  <div class="brand">Kiosk API</div>
+  <div class="sub">Backend guide, step by step</div>
+  <div class="progress"><span id="bar"></span></div>
+  <div class="ptext" id="ptext">0 steps done</div>
+  <div id="toc-links"></div>
+</nav>
+
+<main>
+<button class="theme-btn" id="themeBtn">Toggle theme</button>
+<header class="hero">
+  <h1>Build the Kiosk backend, step by step</h1>
+  <p>This guide builds a REST API for a classifieds marketplace from an empty folder. It uses Node.js, Express 5, TypeScript, MongoDB (Mongoose), JWT auth, Zod validation and Multer image uploads.</p>
+  <p>Every code block is the real code from the <code>backend/</code> folder. Work through the steps in order and tick each one off as you finish it.</p>
+</header>
+
+<!-- ===================================================== OVERVIEW -->
+<div class="phase" id="overview">
+  <div class="phase-label">Before you start</div>
+  <h2>The big picture</h2>
+</div>
+
+<h3>What the API does</h3>
+<ul class="clean">
+  <li><b>Users</b> can create an account and log in. They get back a <b>JWT token</b> that proves who they are.</li>
+  <li><b>Listings</b> (car, phone, sofa…) can be browsed, searched, filtered and sorted by anyone.</li>
+  <li>Logged-in users can <b>post</b> a listing with a photo, <b>edit</b> it, <b>delete</b> it and see <b>their own</b> listings.</li>
+</ul>
+
+<h3>How a request travels through the code</h3>
+<div class="flow">
+  <div class="box"><b>Client</b><small>React / Postman</small></div><span class="arrow">→</span>
+  <div class="box"><b>app.ts</b><small>cors, json, static</small></div><span class="arrow">→</span>
+  <div class="box"><b>Route</b><small>URL + method</small></div><span class="arrow">→</span>
+  <div class="box"><b>Middleware</b><small>auth · multer · zod</small></div><span class="arrow">→</span>
+  <div class="box"><b>Controller</b><small>the actual logic</small></div><span class="arrow">→</span>
+  <div class="box"><b>Model</b><small>Mongoose</small></div><span class="arrow">→</span>
+  <div class="box"><b>MongoDB</b></div>
+</div>
+<p>Each layer has one job. If validation fails, the middleware answers right away and the controller never runs. That keeps controllers short and focused.</p>
+
+<h3>Final folder structure</h3>
+<div class="tree">backend/
+├── .env                 <i># secrets and settings (never commit)</i>
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── uploads/listings/    <i># photos saved by multer (auto-created)</i>
+└── src/
+    ├── server.ts        <i># entry point: connect DB, start server</i>
+    ├── app.ts           <i># express app + global middleware</i>
+    ├── seed.ts          <i># demo data on first run</i>
+    ├── config/
+    │   ├── index.ts     <i># reads .env</i>
+    │   ├── database.ts  <i># connect / disconnect MongoDB</i>
+    │   └── multer.ts    <i># image upload settings</i>
+    ├── models/          <i># Mongoose schemas = database shape</i>
+    ├── schemas/         <i># Zod schemas = request validation</i>
+    ├── middleware/      <i># authenticate, validateBody, validateParams</i>
+    ├── controllers/     <i># the logic for each endpoint</i>
+    ├── routes/          <i># URL → middleware → controller</i>
+    └── utils/           <i># jwt helpers, response helpers</i></div>
+
+<h3>The endpoints you will build</h3>
+<table>
+  <tr><th>Method</th><th>URL</th><th>Auth</th><th>What it does</th></tr>
+  <tr><td><span class="m POST">POST</span></td><td><code>/api/users/register</code></td><td>—</td><td>Create an account and return a token</td></tr>
+  <tr><td><span class="m POST">POST</span></td><td><code>/api/users/login</code></td><td>—</td><td>Log in and return a token</td></tr>
+  <tr><td><span class="m GET">GET</span></td><td><code>/api/listings/list?cat=&amp;q=&amp;sort=</code></td><td>—</td><td>Browse, filter, search and sort listings</td></tr>
+  <tr><td><span class="m GET">GET</span></td><td><code>/api/listings/byid/:id</code></td><td>—</td><td>One listing (adds +1 view)</td></tr>
+  <tr><td><span class="m GET">GET</span></td><td><code>/api/listings/mine</code></td><td>🔒</td><td>The logged-in user's listings</td></tr>
+  <tr><td><span class="m POST">POST</span></td><td><code>/api/listings/create</code></td><td>🔒</td><td>Post a listing with an optional photo</td></tr>
+  <tr><td><span class="m PUT">PUT</span></td><td><code>/api/listings/edit/:id</code></td><td>🔒 owner</td><td>Edit your listing (including its status)</td></tr>
+  <tr><td><span class="m DELETE">DELETE</span></td><td><code>/api/listings/delete/:id</code></td><td>🔒 owner</td><td>Delete your listing</td></tr>
+</table>
+
+<h3>What you need installed</h3>
+<ul class="clean">
+  <li><b>Node.js 22.18 or newer</b> (you have v24). This setup relies on Node's <b>built-in TypeScript support</b>, which is why imports end with <code>.ts</code>. Check with <code>node -v</code>.</li>
+  <li><b>MongoDB</b>: either <a href="https://www.mongodb.com/try/download/community">MongoDB Community Server</a> running locally, or a free <a href="https://www.mongodb.com/atlas">MongoDB Atlas</a> cluster. <b>MongoDB Compass</b> helps you see the data.</li>
+  <li>An API client to test with: <b>Postman</b>, <b>Insomnia</b> or the <b>Thunder Client</b> VS Code extension.</li>
+</ul>
+
+<!-- ===================================================== PHASE 1 -->
+<div class="phase" id="phase1">
+  <div class="phase-label">Phase 1</div>
+  <h2>Project setup and first run</h2>
+</div>
+
+<section class="step" data-step="Create the project">
+  <p class="lead">Make the folder, create <code>package.json</code> and install every package.</p>
+  <div class="codeblock" data-lang="bash" data-file="terminal"><pre><code>mkdir backend
+cd backend
+npm init -y
+
+# runtime packages
+npm install express cors dotenv mongoose bcrypt jsonwebtoken multer zod
+
+# development-only packages (types + tools)
+npm install -D typescript ts-node nodemon @types/node @types/express @types/cors @types/bcrypt @types/jsonwebtoken @types/multer</code></pre></div>
+  <table>
+    <tr><th>Package</th><th>Why you need it</th></tr>
+    <tr><td><code>express</code></td><td>The web framework: routes, middleware, requests and responses</td></tr>
+    <tr><td><code>cors</code></td><td>Lets the React app (another port) call the API</td></tr>
+    <tr><td><code>dotenv</code></td><td>Loads the <code>.env</code> file into <code>process.env</code></td></tr>
+    <tr><td><code>mongoose</code></td><td>Talks to MongoDB using schemas and models</td></tr>
+    <tr><td><code>bcrypt</code></td><td>Hashes passwords so they are never stored in plain text</td></tr>
+    <tr><td><code>jsonwebtoken</code></td><td>Creates and checks the login tokens (JWT)</td></tr>
+    <tr><td><code>multer</code></td><td>Reads <code>multipart/form-data</code>, which is how files are uploaded</td></tr>
+    <tr><td><code>zod</code></td><td>Validates what the client sends before it reaches the database</td></tr>
+    <tr><td><code>nodemon</code> + <code>ts-node</code></td><td>Restarts the server every time you save a file</td></tr>
+  </table>
+  <p>Now open <code>package.json</code>. Add <code>"type": "module"</code> so you can use <code>import</code>/<code>export</code>, and add a <code>dev</code> script:</p>
+  <div class="codeblock" data-lang="json" data-file="package.json (the parts to change)"><pre><code>{
+  "name": "kiosk_api",
+  "version": "1.0.0",
+  "description": "API for the Kiosk classifieds marketplace",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts"
+  }
+}</code></pre></div>
+</section>
+
+<section class="step" data-step="Configure TypeScript">
+  <p class="lead">Create <code>tsconfig.json</code> at the root of <code>backend/</code>.</p>
+  <div class="codeblock" data-lang="json" data-file="tsconfig.json"><pre><code>{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // Environment Settings
+    "module": "nodenext",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node"],
+
+    // Other Outputs
+    "sourceMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+
+    // Recommended Options
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  }
+}</code></pre></div>
+  <p>The options that matter most here:</p>
+  <ul class="clean">
+    <li><code>"strict": true</code> turns on all of TypeScript's safety checks.</li>
+    <li><code>"noEmit": true</code>: TypeScript only <b>checks</b> the code. Node runs the <code>.ts</code> files directly, so no <code>dist/</code> folder is built.</li>
+    <li><code>"allowImportingTsExtensions": true</code> lets you write <code>import app from './app.ts'</code>. Node needs the real file extension.</li>
+    <li><code>"verbatimModuleSyntax": true</code> makes you write <code>import type { ... }</code> for things that are only types. Node deletes type imports when it runs the file, so it has to know which imports are types.</li>
+  </ul>
+  <div class="warn"><b>Rule to remember</b>Always import your own files with the <code>.ts</code> extension, and use <code>import type</code> for interfaces and types. Most "cannot find module" or "does not provide an export named" errors come from breaking this rule.</div>
+</section>
+
+<section class="step" data-step="Environment variables">
+  <p class="lead">Keep settings and secrets out of the code. Create <code>.env</code> and <code>.gitignore</code>.</p>
+  <div class="codeblock" data-lang="ini" data-file=".env"><pre><code>PORT=5000
+NODE_ENV=development
+
+# Local mongodb url
+MONGODB_URL=mongodb://localhost:27017/kiosk
+
+# jwt config
+JWT_SECRET=put-a-long-random-string-here
+JWT_EXPIRES_IN=7d</code></pre></div>
+  <div class="note"><b>Using MongoDB Atlas?</b>Paste your connection string instead, for example <code>mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/kiosk</code>. The part after the last <code>/</code> is the database name.</div>
+  <div class="codeblock" data-lang="plaintext" data-file=".gitignore"><pre><code>node_modules
+.env
+uploads</code></pre></div>
+  <p>Now create the <code>src/</code> folder and its subfolders: <code>config</code>, <code>models</code>, <code>schemas</code>, <code>middleware</code>, <code>controllers</code>, <code>routes</code> and <code>utils</code>.</p>
+</section>
+
+<section class="step" data-step="Config loader">
+  <p class="lead">One place that reads <code>.env</code>, with safe defaults. The rest of the code imports <code>config</code> and never reads <code>process.env</code> directly.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/config/index.ts"><pre><code>import dotenv from 'dotenv';
+dotenv.config();
+
+
+export const config = {
+    port: parseInt( process.env.PORT || '5000' ),
+    nodeEnv: process.env.NODE_ENV || 'development',
+    mongodb_url: process.env.MONGODB_URL || 'mongodb://localhost:27017/kiosk',
+    jwtSecret: process.env.JWT_SECRET || 'KIOSKSECRETKEYCHANGEMEINPRODUCTION',
+    jwtExpireIn: process.env.JWT_EXPIRES_IN || '7d'
+}</code></pre></div>
+  <p><code>dotenv.config()</code> must run before anything reads <code>process.env</code>. That is why it sits at the top of this file.</p>
+</section>
+
+<section class="step" data-step="Database connection">
+  <p class="lead">Two small functions: one connects to MongoDB at startup, the other closes the connection at shutdown.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/config/database.ts"><pre><code>import mongoose from 'mongoose';
+import { config } from './index.ts';
+
+
+export const connectDatabase = async () : Promise&lt;void&gt; =&gt;{
+
+    try {
+
+        await mongoose.connect( config.mongodb_url );
+
+        console.log('✅ MongoDB connected successfully');
+
+    } catch (error) {
+        console.error('MongoDB connection failed', error);
+        process.exit(1)
+    }
+
+}
+
+
+export const disconnectDatabase = async () : Promise&lt;void&gt; =&gt;{
+
+    try {
+
+        await mongoose.connection.close();
+        console.log('Mongodb disconnected');
+
+    } catch (error) {
+        console.error('Error disconnecting :', error)
+    }
+
+}</code></pre></div>
+  <p>If the connection fails, there is no point running the API, so <code>process.exit(1)</code> stops the process with an error code.</p>
+</section>
+
+<section class="step" data-step="Express app (first version)">
+  <p class="lead">Keep the Express app in <code>app.ts</code>, separate from the code that starts the server. This first version has no routes yet. You will add them in Phase 3.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/app.ts (temporary)"><pre><code>import express from 'express';
+import cors from 'cors';
+
+
+const app = express();
+
+// the react app runs on another port, so it needs permission to call us
+app.use(cors());
+
+// read json bodies
+app.use(express.json());
+
+// quick test route, we will remove it later
+app.get('/api/health', (req, res)=>{
+    res.json({ ok: true });
+})
+
+
+export default app;</code></pre></div>
+  <ul class="clean">
+    <li><code>cors()</code>: the React app runs on <code>localhost:5173</code> and the API on <code>localhost:5000</code>. Browsers block calls between different ports unless the server allows them.</li>
+    <li><code>express.json()</code> turns a JSON request body into <code>req.body</code>. Without it, <code>req.body</code> is <code>undefined</code>.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Server entry point + first run">
+  <p class="lead">Connect to the database first, then start listening.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/server.ts (temporary)"><pre><code>import app from './app.ts';
+import { connectDatabase } from './config/database.ts';
+import { config } from './config/index.ts';
+
+
+const startServer = async ()=>{
+
+    try {
+
+        // 1 connect to db
+        await connectDatabase();
+
+        // 2 start express server
+        app.listen(config.port, ()=>{
+            console.log(`Server running on http://localhost:${config.port}`);
+        })
+
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+
+}
+
+
+startServer();</code></pre></div>
+  <div class="codeblock" data-lang="bash" data-file="terminal"><pre><code>npm run dev</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint</b>You should see <code>✅ MongoDB connected successfully</code> and <code>Server running on http://localhost:5000</code>. Open <a href="http://localhost:5000/api/health">http://localhost:5000/api/health</a> and you should get <code>{"ok":true}</code>.</div>
+  <div class="warn"><b>If it fails</b><code>ECONNREFUSED 127.0.0.1:27017</code> means MongoDB is not running. On Windows, start the "MongoDB" service from <i>Services</i>, or check your Atlas URL and IP allow-list.</div>
+</section>
+
+<!-- ===================================================== PHASE 2 -->
+<div class="phase" id="phase2">
+  <div class="phase-label">Phase 2</div>
+  <h2>Shared helpers</h2>
+</div>
+
+<section class="step" data-step="Response helpers">
+  <p class="lead">Every endpoint answers in the same shape: <code>{ success, data, message }</code> on success and <code>{ success: false, error, details }</code> on failure. The frontend can then handle all responses the same way.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/utils/response.ts"><pre><code>import type { Response } from "express";
+
+
+export const sendSuccess = ( res: Response, data: any, message?: string )=&gt;{
+
+    res.status(200).json({
+        success: true,
+        data,
+        message: message ? message : 'success!'
+    })
+
+}
+
+
+export const sendCreated = ( res: Response, data: any, message : string = 'Resource created successfully')=&gt;{
+    res.status(201).json({
+        success: true,
+        message,
+        data
+    })
+}
+
+
+export const sendNoContent = ( res: Response )=&gt;{
+    res.status(204).send();
+}
+
+
+export const sendBadRequest = ( res: Response, message: string = 'Bad request', details: any = {} )=&gt;{
+    res.status(400).json({
+        success: false,
+        error: message,
+        details
+    })
+}
+
+
+export const sendNotFound = ( res: Response , message: string = 'Resource not found' )=&gt;{
+    res.status(404).json({
+        success: false,
+        error: message
+    })
+}
+
+
+export const sendForbidden = ( res: Response , message: string = 'You cannot do that' )=&gt;{
+    res.status(403).json({
+        success: false,
+        error: message
+    })
+}</code></pre></div>
+  <table>
+    <tr><th>Code</th><th>Meaning</th></tr>
+    <tr><td>200</td><td>OK: here is your data</td></tr>
+    <tr><td>201</td><td>Created: a new user or listing was made</td></tr>
+    <tr><td>204</td><td>No Content: done, nothing to send back (used for delete)</td></tr>
+    <tr><td>400</td><td>Bad Request: the input is wrong</td></tr>
+    <tr><td>401</td><td>Unauthorized: missing or invalid token</td></tr>
+    <tr><td>403</td><td>Forbidden: logged in, but this is not yours</td></tr>
+    <tr><td>404</td><td>Not Found</td></tr>
+  </table>
+</section>
+
+<section class="step" data-step="JWT helpers">
+  <p class="lead">A JWT is a signed string that holds the user's id, email and role. The server signs it with <code>JWT_SECRET</code>, so nobody can fake one without the secret.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/utils/jwt.ts"><pre><code>import jwt from 'jsonwebtoken';
+import { config } from '../config/index.ts';
+
+// payload interface
+
+export interface JwtPayload {
+    userId: string;
+    email: string;
+    role: string;
+}
+
+
+export const generateToken = ( payload: JwtPayload ): string =&gt;{
+
+    return jwt.sign( payload, config.jwtSecret , { expiresIn: config.jwtExpireIn as any } )
+
+}
+
+
+export const verifyToken = (token: string) : JwtPayload | null  =&gt;{
+
+    try {
+
+        const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload;
+        return decoded;
+
+    } catch (error) {
+        return null;
+    }
+
+}</code></pre></div>
+  <p><code>verifyToken</code> returns <code>null</code> instead of throwing when a token is expired, tampered with or garbage. That makes it easy to use in the auth middleware.</p>
+  <div class="note"><b>Good to know</b>A JWT is <b>signed, not encrypted</b>. Anyone can paste it into jwt.io and read the payload, so never put a password or other secret inside it.</div>
+</section>
+
+<!-- ===================================================== PHASE 3 -->
+<div class="phase" id="phase3">
+  <div class="phase-label">Phase 3</div>
+  <h2>Users: register and login</h2>
+</div>
+
+<section class="step" data-step="User model">
+  <p class="lead">The model describes how a user is stored in MongoDB. The <code>pre('save')</code> hook hashes the password automatically before every save.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/models/user.models.ts"><pre><code>import mongoose, { Schema, Document } from "mongoose";
+import bcrypt from 'bcrypt';
+
+export interface IUser extends Document {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    role: 'user' | 'admin';
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const userSchema = new Schema&lt;IUser&gt;({
+
+        name: {
+            type: String,
+            required: [true, 'name is required'],
+        },
+        email: {
+            type: String,
+            required: [ true, 'email is required' ],
+            unique: true
+        },
+        phone: {
+            type: String,
+            required: [ true, 'phone is required' ]
+        },
+        password: {
+            type: String,
+            required: [true, 'password is required'],
+        },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user'
+        }
+
+    },
+    {
+        timestamps: true
+    }
+
+)
+
+
+// hash the password before saving it
+userSchema.pre('save', async function(){
+
+    if(!this.isModified('password')){
+        return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+
+})
+
+
+export const User = mongoose.model&lt;IUser&gt;('User', userSchema);</code></pre></div>
+  <ul class="clean">
+    <li><code>IUser</code> is the TypeScript interface. <code>userSchema</code> is the MongoDB shape. Keep them in sync.</li>
+    <li><code>unique: true</code> on email creates a unique index in MongoDB.</li>
+    <li><code>timestamps: true</code> adds <code>createdAt</code> and <code>updatedAt</code> automatically.</li>
+    <li><code>isModified('password')</code> stops the hook from hashing a password that is already hashed, for example when you save a user after changing only their name.</li>
+    <li>The hook uses <code>function(){}</code>, not an arrow function, because it needs <code>this</code> to be the document.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="User validation schemas (Zod)">
+  <p class="lead">Mongoose protects the <b>database</b>. Zod protects the <b>API</b>: it rejects bad input with clear messages before the controller runs.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/schemas/user.schema.ts"><pre><code>import { z } from 'zod';
+
+export const registerUserSchema = z.object({
+
+    name: z
+        .string('name is required')
+        .min(2, 'name must be at least 2 characters')
+        .max(50, 'name cannot exceed 50 characters')
+        .trim(),
+
+    email: z
+        .string('email is required')
+        .email('invalid email format')
+        .toLowerCase()
+        .trim(),
+
+    phone: z
+        .string('phone is required')
+        .min(6, 'phone must be at least 6 characters')
+        .max(20, 'phone cannot exceed 20 characters')
+        .trim(),
+
+    password: z
+        .string('password is required')
+        .min(6, 'password must be at least 6 characters')
+        .max(100, 'password cannot exceed 100 characters')
+        .trim(),
+
+})
+
+
+export const loginUserSchema = z.object({
+
+    email: z
+        .string('email is required')
+        .email('invalid email format')
+        .toLowerCase()
+        .trim(),
+
+    password: z
+        .string('password is required')
+        .min(6, 'password must be at least 6 characters')
+        .max(100, 'password cannot exceed 100 characters')
+        .trim(),
+
+})
+
+
+export type RegisterUserInput = z.infer&lt;typeof registerUserSchema&gt;;
+export type LoginUserInput = z.infer&lt;typeof loginUserSchema&gt;;</code></pre></div>
+  <p><code>z.infer</code> turns a schema into a TypeScript type, so the controller knows exactly what <code>req.body</code> contains. <code>.toLowerCase()</code> on the email means <code>Rohan@Gmail.com</code> and <code>rohan@gmail.com</code> count as the same account.</p>
+</section>
+
+<section class="step" data-step="Validation middleware">
+  <p class="lead">A reusable middleware factory. Give it a Zod schema and it returns a middleware that checks <code>req.body</code> or <code>req.params</code>.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/middleware/validate.middleware.ts"><pre><code>import type { Request, Response , NextFunction } from 'express';
+import { sendBadRequest } from '../utils/response.ts';
+
+
+export const validateBody = &lt;T&gt;(schema: any) =&gt;{
+
+    return (req: Request, res: Response, next: NextFunction): void =&gt;{
+
+        const result = schema.safeParse(req.body);
+
+        if(!result.success){
+            const errors = formatZodErrors(result.error);
+            return sendBadRequest(res, 'validation failed', errors);
+        }
+
+        req.body = result.data as T;
+        next();
+
+    }
+
+}
+
+
+export const validateParams = &lt;T&gt;(schema: any) =&gt;{
+
+    return (req: Request, res: Response, next: NextFunction): void =&gt;{
+
+        const result = schema.safeParse(req.params);
+
+        if(!result.success){
+            const errors = formatZodErrors(result.error);
+            return sendBadRequest(res, 'invalid params', errors);
+        }
+
+        req.params = result.data;
+        next();
+
+    }
+
+}
+
+
+const formatZodErrors = (error: any)=&gt;{
+
+    return error.issues.map((err: any)=&gt;{
+
+        return {
+            field: err.path.join('.'),
+            message: err.message
+        }
+
+    })
+
+}</code></pre></div>
+  <p>A middleware receives <code>(req, res, next)</code>. It either <b>answers</b> (and stops the chain) or calls <code>next()</code> to hand over to the next function. After validation, <code>req.body</code> is replaced with the <b>cleaned</b> data: trimmed, lowercased, and with numbers converted.</p>
+  <p>A failed validation returns something like this:</p>
+  <div class="codeblock" data-lang="json" data-file="example 400 response"><pre><code>{
+  "success": false,
+  "error": "validation failed",
+  "details": [
+    { "field": "email", "message": "invalid email format" },
+    { "field": "password", "message": "password must be at least 6 characters" }
+  ]
+}</code></pre></div>
+</section>
+
+<section class="step" data-step="User controller">
+  <p class="lead">The actual logic of register and login.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/controllers/user.controllers.ts"><pre><code>import type { Request, Response } from "express";
+import bcrypt from 'bcrypt';
+
+import { User } from '../models/user.models.ts';
+import { generateToken } from "../utils/jwt.ts";
+import { sendSuccess, sendBadRequest, sendCreated } from "../utils/response.ts";
+import type { LoginUserInput, RegisterUserInput } from "../schemas/user.schema.ts";
+
+
+export const register = async ( req: Request&lt;any, any, RegisterUserInput&gt;, res: Response )=&gt;{
+
+    try {
+
+        const { name, email, phone, password } = req.body;
+
+        // one account per email
+        const existingUser = await User.findOne({ email });
+        if(existingUser){
+            return sendBadRequest(res, 'Email already registered');
+        }
+
+        const user = new User({ name, email, phone, password });
+        await user.save();
+
+        // log the new user in straight away
+        const token = generateToken({
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role
+        })
+
+        sendCreated(res, { user: publicUser(user), token }, 'Account created successfully!');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in registration', error);
+    }
+
+}
+
+
+export const login = async ( req: Request&lt;any, any, LoginUserInput&gt;, res: Response )=&gt;{
+
+    try {
+
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if(!user){
+            return sendBadRequest(res, 'Invalid email or password');
+        }
+
+        const comparePassword = await bcrypt.compare(password, user.password);
+        if(!comparePassword){
+            return sendBadRequest(res, 'Invalid email or password');
+        }
+
+        const token = generateToken({
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role
+        })
+
+        sendSuccess(res, { user: publicUser(user), token }, 'Login successful!');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in login', error);
+    }
+
+}
+
+
+// never send the password back to the browser
+const publicUser = (user: any)=&gt;{
+
+    return {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        createdAt: user.createdAt
+    }
+
+}</code></pre></div>
+  <ul class="clean">
+    <li><b>Register:</b> check the email is free → save the user (the hook hashes the password) → create a token → return the user and the token.</li>
+    <li><b>Login:</b> find the user by email → compare the typed password with the hash using <code>bcrypt.compare</code> → return a token.</li>
+    <li>Login answers <b>"Invalid email or password"</b> in both failure cases on purpose. That way an attacker cannot find out which emails have accounts.</li>
+    <li><code>publicUser()</code> picks only safe fields, so the password hash never leaves the server.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="User routes + wire them up">
+  <p class="lead">Routes connect a URL and method to middleware and a controller. They run from left to right.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/routes/user.routes.ts"><pre><code>import { Router } from 'express';
+import { register, login } from '../controllers/user.controllers.ts';
+import { validateBody } from '../middleware/validate.middleware.ts';
+import { loginUserSchema, registerUserSchema } from '../schemas/user.schema.ts';
+
+
+const router = Router();
+
+
+router.post('/register', validateBody(registerUserSchema), register);
+router.post('/login', validateBody(loginUserSchema), login);
+
+
+export default router;</code></pre></div>
+  <p>Create a main router that groups every resource under one prefix. For now it only has users:</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/routes/index.ts (temporary)"><pre><code>import { Router } from "express";
+import userRoute from './user.routes.ts';
+
+
+const router = Router();
+
+
+router.use('/users', userRoute);
+
+
+export default router;</code></pre></div>
+  <p>In <code>src/app.ts</code>, remove the <code>/api/health</code> test route and mount the router under <code>/api</code>:</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/app.ts (add these lines)"><pre><code>import routes from './routes/index.ts';
+
+// ...after app.use(express.json())
+app.use('/api', routes);</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint: test register and login</b>
+    In Postman, send <span class="m POST">POST</span> <code>http://localhost:5000/api/users/register</code> with <i>Body → raw → JSON</i>:
+  </div>
+  <div class="codeblock" data-lang="json" data-file="request body"><pre><code>{
+  "name": "Test User",
+  "email": "test@gmail.com",
+  "phone": "+91 90000 00000",
+  "password": "123456"
+}</code></pre></div>
+  <p>You should get <b>201</b> with a <code>token</code>. Send the same request again and you should get <b>400 "Email already registered"</b>. Then try <code>/api/users/login</code> with the email and password. In MongoDB Compass, the <code>users</code> collection should show a hashed password that starts with <code>$2b$10$</code>.</p>
+</section>
+
+<!-- ===================================================== PHASE 4 -->
+<div class="phase" id="phase4">
+  <div class="phase-label">Phase 4</div>
+  <h2>Listings: full CRUD, auth and uploads</h2>
+</div>
+
+<section class="step" data-step="Listing model">
+  <p class="lead">A listing belongs to a user through <code>userId</code>, a reference to the <code>User</code> collection.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/models/listing.models.ts"><pre><code>import mongoose, { Schema, Document, Types } from "mongoose";
+
+
+// The six categories of the design. They never change, so we keep them here
+// instead of making a whole Category collection.
+export const CATEGORIES = ['Cars', 'Electronics', 'Rentals', 'Jobs', 'Furniture', 'Phones'];
+
+export const STATUSES = ['Live', 'Paused', 'Sold'];
+
+
+export interface IListing extends Document {
+    title: string;
+    price: number;
+    category: string;
+    place: string;
+    description: string;
+    image?: string | null;
+    status: string;
+    views: number;
+    userId: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+const listingSchema = new Schema&lt;IListing&gt;({
+
+        title: {
+            type: String,
+            required: [ true, 'title is required' ]
+        },
+        price: {
+            type: Number,
+            required: [ true, 'price is required' ],
+            min: [ 0, 'price cannot be negative' ]
+        },
+        category: {
+            type: String,
+            enum: CATEGORIES,
+            required: [ true, 'category is required' ]
+        },
+        place: {
+            type: String,
+            required: [ true, 'location is required' ]
+        },
+        description: {
+            type: String,
+            required: [ true, 'description is required' ]
+        },
+        image: {
+            type: String,
+            default: null
+        },
+        status: {
+            type: String,
+            enum: STATUSES,
+            default: 'Live'
+        },
+        views: {
+            type: Number,
+            default: 0
+        },
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: [ true, 'userId is required' ]
+        }
+
+    },
+    {
+        timestamps: true
+    }
+
+)
+
+
+export const Listing = mongoose.model&lt;IListing&gt;('Listing', listingSchema);</code></pre></div>
+  <ul class="clean">
+    <li><code>enum</code> limits <code>category</code> and <code>status</code> to a fixed list of values.</li>
+    <li><code>ref: 'User'</code> lets you call <code>.populate('userId')</code> later to swap the id for the seller's actual data.</li>
+    <li><code>CATEGORIES</code> and <code>STATUSES</code> are exported so the Zod schemas reuse the <b>same list</b>. Keep one source of truth.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Listing validation schemas">
+  <p class="lead">Three schemas: create (all fields required), edit (all fields optional) and the <code>:id</code> URL parameter.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/schemas/listing.schema.ts"><pre><code>import { z } from 'zod';
+import { CATEGORIES, STATUSES } from '../models/listing.models.ts';
+
+
+export const createListingSchema = z.object({
+
+    title: z
+        .string('title must be a string')
+        .min(5, 'title must be at least 5 characters')
+        .max(100, 'title cannot exceed 100 characters')
+        .trim(),
+
+    // coerce because a multipart form sends every field as text
+    price: z
+        .coerce
+        .number('price must be a number')
+        .min(0, 'price cannot be negative'),
+
+    category: z
+        .enum(CATEGORIES as [string, ...string[]], 'invalid category'),
+
+    place: z
+        .string('location must be a string')
+        .min(2, 'location must be at least 2 characters')
+        .max(60, 'location cannot exceed 60 characters')
+        .trim(),
+
+    description: z
+        .string('description must be a string')
+        .min(10, 'description must be at least 10 characters')
+        .max(2000, 'description cannot exceed 2000 characters')
+        .trim(),
+
+})
+
+
+export const editListingSchema = z.object({
+
+    title: z
+        .string('title must be a string')
+        .min(5, 'title must be at least 5 characters')
+        .max(100, 'title cannot exceed 100 characters')
+        .trim()
+        .optional(),
+
+    price: z
+        .coerce
+        .number('price must be a number')
+        .min(0, 'price cannot be negative')
+        .optional(),
+
+    category: z
+        .enum(CATEGORIES as [string, ...string[]], 'invalid category')
+        .optional(),
+
+    place: z
+        .string('location must be a string')
+        .min(2, 'location must be at least 2 characters')
+        .max(60, 'location cannot exceed 60 characters')
+        .trim()
+        .optional(),
+
+    description: z
+        .string('description must be a string')
+        .min(10, 'description must be at least 10 characters')
+        .max(2000, 'description cannot exceed 2000 characters')
+        .trim()
+        .optional(),
+
+    status: z
+        .enum(STATUSES as [string, ...string[]], 'invalid status')
+        .optional(),
+
+})
+
+
+export const listingIdSchema = z.object({
+    id: z
+        .string('id must be a string')
+        .length(24, 'invalid id format')
+        .regex(/^[A-Za-z0-9]{24}$/ , 'Invalid id')
+})
+
+
+export type CreateListingInput = z.infer&lt;typeof createListingSchema&gt;;
+export type EditListingInput = z.infer&lt;typeof editListingSchema&gt;;
+export type ListingIdInput = z.infer&lt;typeof listingIdSchema&gt;;</code></pre></div>
+  <div class="note"><b>Why <code>z.coerce.number()</code>?</b>Creating a listing with a photo sends <code>multipart/form-data</code>, and in a form every field arrives as <b>text</b>, so price is <code>"480000"</code>. <code>coerce</code> converts it into the number <code>480000</code> before checking it.</div>
+  <p>A MongoDB id is always 24 characters, so <code>listingIdSchema</code> rejects bad ids early. Without it, Mongoose would throw a <code>CastError</code>.</p>
+</section>
+
+<section class="step" data-step="Auth middleware">
+  <p class="lead">This middleware protects private routes. It reads the token from the <code>Authorization</code> header, checks it, and attaches the user to <code>req.user</code>.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/middleware/auth.middleware.ts"><pre><code>import type { Request, Response , NextFunction } from 'express';
+import { verifyToken } from '../utils/jwt.ts';
+import type { JwtPayload } from '../utils/jwt.ts';
+
+
+export interface AuthRequest extends Request {
+    user?: JwtPayload
+}
+
+
+export const authenticate = ( req: AuthRequest, res: Response, next: NextFunction ) : void =&gt;{
+
+    const authHeader = req.headers.authorization;
+
+    if(!authHeader || !authHeader.startsWith('Bearer ') ){
+        res.status(401).json({
+            success: false,
+            error: 'No token provided, please login'
+        })
+        return;
+    }
+
+    // "Bearer xxxxx"  -&gt;  we skip the first 7 characters
+    const token = authHeader.substring(7);
+    const decoded = verifyToken(token);
+
+    if(!decoded){
+        res.status(401).json({
+            success: false,
+            error: 'Invalid token, please login again'
+        })
+        return;
+    }
+
+    req.user = decoded;
+    next();
+
+}</code></pre></div>
+  <p>The client sends the header like this: <code>Authorization: Bearer eyJhbGciOiJIUzI1NiIs...</code>. <code>AuthRequest</code> extends Express's <code>Request</code> type so TypeScript knows <code>req.user</code> exists.</p>
+</section>
+
+<section class="step" data-step="Image upload (Multer)">
+  <p class="lead">Multer saves the uploaded photo to <code>uploads/listings/</code> with a unique name, and puts its info in <code>req.file</code>.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/config/multer.ts"><pre><code>import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+
+const uploadDir = 'uploads/listings';
+
+
+if(!fs.existsSync(uploadDir)){
+    fs.mkdirSync( uploadDir, { recursive: true } )
+}
+
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb)=&gt;{
+        cb(null, uploadDir)
+    },
+    filename: (req, file, cb)=&gt;{
+        // Format: listing-1234567890-randomnumber.jpg
+
+        const uniqueSuffixe = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname( file.originalname );
+        const filename = `listing-${uniqueSuffixe}${ext}`;
+
+        cb(null, filename);
+    }
+
+})
+
+
+export const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024
+    }
+})</code></pre></div>
+  <ul class="clean">
+    <li>The folder is created when the app starts if it does not exist.</li>
+    <li>The file name is <code>listing-&lt;timestamp&gt;-&lt;random&gt;.jpg</code>, so two uploads named <code>photo.jpg</code> never overwrite each other.</li>
+    <li><code>fileSize: 5 MB</code> rejects huge files.</li>
+  </ul>
+  <p>Multer also <b>fills <code>req.body</code></b> with the text fields of the form. That is why it must run <b>before</b> <code>validateBody</code> in the route.</p>
+</section>
+
+<section class="step" data-step="Listing controller">
+  <p class="lead">Six functions: list, detail, mine, create, edit and delete.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/controllers/listing.controllers.ts"><pre><code>import type { Request, Response } from 'express';
+
+import { Listing } from '../models/listing.models.ts';
+import type { AuthRequest } from '../middleware/auth.middleware.ts';
+import type { CreateListingInput, EditListingInput, ListingIdInput } from '../schemas/listing.schema.ts';
+import { sendSuccess, sendBadRequest, sendCreated, sendNoContent, sendNotFound, sendForbidden } from '../utils/response.ts';
+
+
+// GET /api/listings/list?cat=Cars&amp;q=swift&amp;sort=price_asc
+export const listListings = async ( req: Request, res: Response )=&gt;{
+
+    try {
+
+        const { cat, q, sort } = req.query;
+
+        // 1 - build the filter
+        const filter: any = {};
+
+        if(cat &amp;&amp; cat !== 'All'){
+            filter.category = cat;
+        }
+
+        if(q){
+            // 'i' means case insensitive
+            filter.title = { $regex: q, $options: 'i' };
+        }
+
+        // 2 - build the sort
+        let sortBy: any = { createdAt: -1 };     // newest first
+
+        if(sort === 'price_asc'){
+            sortBy = { price: 1 };
+        }
+        if(sort === 'price_desc'){
+            sortBy = { price: -1 };
+        }
+
+        const listings = await Listing.find(filter).sort(sortBy).populate('userId', 'name phone createdAt');
+
+        sendSuccess(res, listings, 'list of listings');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in list', error);
+    }
+
+}
+
+
+// GET /api/listings/byid/:id
+export const getListingById = async ( req: Request&lt;ListingIdInput&gt;, res: Response )=&gt;{
+
+    try {
+
+        const { id } = req.params;
+
+        // $inc adds 1 to the views counter every time the page is opened
+        const listing = await Listing
+            .findByIdAndUpdate( id, { $inc: { views: 1 } }, { new: true } )
+            .populate('userId', 'name phone createdAt');
+
+        if(!listing){
+            return sendNotFound(res, 'listing not found');
+        }
+
+        sendSuccess(res, listing, 'listing detail');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in detail', error);
+    }
+
+}
+
+
+// GET /api/listings/mine   ( needs a token )
+export const getMyListings = async ( req: AuthRequest, res: Response )=&gt;{
+
+    try {
+
+        const listings = await Listing
+            .find({ userId: req.user?.userId })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'name phone createdAt');
+
+        sendSuccess(res, listings, 'my listings');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in my listings', error);
+    }
+
+}
+
+
+// POST /api/listings/create   ( needs a token )
+export const createListing = async ( req: AuthRequest, res: Response )=&gt;{
+
+    try {
+
+        const body = req.body as CreateListingInput;
+
+        // multer put the uploaded file in req.file
+        const imagePath = req.file ? `/uploads/listings/${req.file.filename}` : null;
+
+        const listing = new Listing({
+            ...body,
+            image: imagePath,
+            userId: req.user?.userId
+        });
+
+        await listing.save();
+
+        sendCreated(res, listing, 'listing published');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in creation', error);
+    }
+
+}
+
+
+// PUT /api/listings/edit/:id   ( needs a token, and you must own the listing )
+export const editListing = async ( req: AuthRequest, res: Response )=&gt;{
+
+    try {
+
+        const { id } = req.params;
+        const updates = req.body as EditListingInput;
+
+        const listing = await Listing.findById(id);
+
+        if(!listing){
+            return sendNotFound(res, 'listing not found');
+        }
+
+        if(listing.userId.toString() !== req.user?.userId){
+            return sendForbidden(res, 'this listing is not yours');
+        }
+
+        const updated = await Listing
+            .findByIdAndUpdate( id, updates, { new: true } )
+            .populate('userId', 'name phone createdAt');
+
+        sendSuccess(res, updated, 'listing updated');
+
+    } catch (error) {
+        sendBadRequest(res, 'error in edit', error);
+    }
+
+}
+
+
+// DELETE /api/listings/delete/:id   ( needs a token, and you must own the listing )
+export const deleteListing = async ( req: AuthRequest, res: Response )=&gt;{
+
+    try {
+
+        const { id } = req.params;
+
+        const listing = await Listing.findById(id);
+
+        if(!listing){
+            return sendNotFound(res, 'listing not found');
+        }
+
+        if(listing.userId.toString() !== req.user?.userId){
+            return sendForbidden(res, 'this listing is not yours');
+        }
+
+        await Listing.findByIdAndDelete(id);
+
+        sendNoContent(res);
+
+    } catch (error) {
+        sendBadRequest(res, 'error in delete', error);
+    }
+
+}</code></pre></div>
+  <h3>Key ideas in this file</h3>
+  <ul class="clean">
+    <li><b>Dynamic filter:</b> start with an empty object <code>{}</code> (which matches everything) and add conditions only when the query string has them.</li>
+    <li><b>Search:</b> <code>$regex</code> with <code>'i'</code> matches "swift" inside "2019 Maruti <b>Swift</b> VXi".</li>
+    <li><b>Sort:</b> <code>1</code> means ascending and <code>-1</code> means descending.</li>
+    <li><b>populate:</b> <code>.populate('userId', 'name phone createdAt')</code> replaces the id with the seller's name, phone and join date, and nothing else.</li>
+    <li><b>Views counter:</b> <code>findByIdAndUpdate</code> with <code>$inc</code> reads the listing and adds 1 to its views in a single database call. <code>{ new: true }</code> returns the updated version.</li>
+    <li><b>Ownership check:</b> before edit or delete, compare <code>listing.userId</code> with the id inside the token. Being logged in is not enough. You must be <b>the owner</b>. <code>.toString()</code> is needed because <code>userId</code> is an <code>ObjectId</code>, not a string.</li>
+    <li><b>Image path:</b> the database stores <code>/uploads/listings/xxx.jpg</code>. The frontend adds <code>http://localhost:5000</code> in front to display it.</li>
+  </ul>
+</section>
+
+<section class="step" data-step="Listing routes">
+  <p class="lead">This file shows the middleware order clearly. Read each line from left to right.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/routes/listing.routes.ts"><pre><code>import { Router } from "express";
+
+import { listListings, getListingById, getMyListings, createListing, editListing, deleteListing } from "../controllers/listing.controllers.ts";
+import { validateBody, validateParams } from "../middleware/validate.middleware.ts";
+import { createListingSchema, editListingSchema, listingIdSchema } from "../schemas/listing.schema.ts";
+import { authenticate } from "../middleware/auth.middleware.ts";
+import { upload } from "../config/multer.ts";
+
+
+const router = Router();
+
+
+// public
+router.get('/list', listListings);
+router.get('/byid/:id', validateParams(listingIdSchema), getListingById);
+
+// private - a token is required
+router.get('/mine', authenticate, getMyListings);
+router.post('/create', authenticate, upload.single('image'), validateBody(createListingSchema), createListing);
+router.put('/edit/:id', authenticate, validateParams(listingIdSchema), validateBody(editListingSchema), editListing);
+router.delete('/delete/:id', authenticate, validateParams(listingIdSchema), deleteListing);
+
+
+export default router;</code></pre></div>
+  <p>For <code>/create</code>, the order is <b>authenticate</b> (who are you?) → <b>upload.single('image')</b> (read the form and save the photo) → <b>validateBody</b> (check the fields) → <b>createListing</b>.</p>
+  <p>Add the listings router to <code>src/routes/index.ts</code>. This is the final version:</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/routes/index.ts"><pre><code>import { Router } from "express";
+import listingRoute from './listing.routes.ts';
+import userRoute from './user.routes.ts';
+
+
+const router = Router();
+
+
+router.use('/listings', listingRoute);
+router.use('/users', userRoute);
+
+
+export default router;</code></pre></div>
+</section>
+
+<section class="step" data-step="Serve uploaded images">
+  <p class="lead">Photos are saved on disk, but the browser still needs a URL to load them. <code>express.static</code> serves the <code>uploads</code> folder. Here is the final <code>app.ts</code>:</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/app.ts"><pre><code>import express from 'express';
+import cors from 'cors';
+import routes from './routes/index.ts';
+
+
+const app = express();
+
+// the react app runs on another port, so it needs permission to call us
+app.use(cors());
+
+// read json bodies
+app.use(express.json());
+
+// serve the uploaded photos: http://localhost:4000/uploads/listings/xxx.jpg
+app.use('/uploads', express.static('./uploads'));
+
+app.use('/api', routes);
+
+
+export default app;</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint: test listings</b>
+    <ol style="margin:6px 0 0;padding-left:20px">
+      <li>Log in and copy the <code>token</code>.</li>
+      <li><span class="m POST">POST</span> <code>/api/listings/create</code>. Under <i>Auth</i>, choose Bearer Token and paste it. Under <i>Body</i>, choose <b>form-data</b> and add <code>title</code>, <code>price</code>, <code>category</code> (for example <code>Cars</code>), <code>place</code> and <code>description</code>. Add an <code>image</code> field of type <b>File</b>.</li>
+      <li>You should get <b>201</b>. Open <code>http://localhost:5000</code> + the <code>image</code> path in your browser to see the photo.</li>
+      <li><span class="m GET">GET</span> <code>/api/listings/list?cat=Cars&amp;sort=price_asc</code> should include your listing.</li>
+      <li>Try to edit it with a <b>different</b> user's token. You should get <b>403</b>.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================================================== PHASE 5 -->
+<div class="phase" id="phase5">
+  <div class="phase-label">Phase 5</div>
+  <h2>Demo data and a clean shutdown</h2>
+</div>
+
+<section class="step" data-step="Seed script">
+  <p class="lead">Fill an empty database with 2 sellers and 8 listings, so the site has content on the first run.</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/seed.ts"><pre><code>import { User } from './models/user.models.ts';
+import { Listing } from './models/listing.models.ts';
+
+
+// Fills an empty database with two sellers and the eight listings of the design,
+// so the site is not empty the first time you open it.
+export const seedDatabase = async ()=&gt;{
+
+    try {
+
+        const listingCount = await Listing.countDocuments();
+
+        if(listingCount &gt; 0){
+            console.log('Database already has listings, nothing to seed');
+            return;
+        }
+
+        // 1 - the two sellers ( password of both: 123456 )
+        const rohan = new User({
+            name: 'Rohan Kulkarni',
+            email: 'rohan@gmail.com',
+            phone: '+91 98765 43210',
+            password: '123456'
+        })
+        await rohan.save();
+
+        const aditi = new User({
+            name: 'Aditi Rane',
+            email: 'aditi@gmail.com',
+            phone: '+91 91234 56780',
+            password: '123456'
+        })
+        await aditi.save();
+
+        // 2 - the eight listings
+        const listings = [
+            {
+                title: '2019 Maruti Swift VXi, single owner',
+                hoursAgo: 2,
+                price: 480000,
+                category: 'Cars',
+                place: 'Kothrud',
+                views: 184,
+                status: 'Live',
+                userId: rohan._id,
+                description: 'Bought new in 2019 and driven mostly on weekends — 41,000 km on the clock, all servicing done at the authorised centre with records in the folder. New tyres in March, insurance valid until next August. Small scuff on the rear bumper that I have not bothered to fix, visible in the photos. Selling because I have moved to a company car.'
+            },
+            {
+                title: 'MacBook Air M2, 16 GB, boxed',
+                hoursAgo: 5,
+                price: 72000,
+                category: 'Electronics',
+                place: 'Baner',
+                views: 302,
+                status: 'Live',
+                userId: aditi._id,
+                description: 'Two years old, used for design work and always on a stand with an external keyboard, so the body and keys are clean. Battery health 91 percent. Comes with the original box, charger and a sleeve. Screen has no scratches. Upgrading to a Pro, otherwise I would have kept it.'
+            },
+            {
+                title: '2 BHK on rent, furnished, Viman Nagar',
+                hoursAgo: 26,
+                price: 28000,
+                category: 'Rentals',
+                place: 'Viman Nagar',
+                views: 517,
+                status: 'Live',
+                userId: aditi._id,
+                description: 'Sixth floor, east facing, 940 sq ft carpet. Fully furnished — beds, wardrobes, sofa, fridge, washing machine and two ACs. Covered parking for one car, lift and backup power. Society is quiet and walkable to the airport road. Eleven month agreement, two months deposit, no brokerage.'
+            },
+            {
+                title: 'Front-end developer, React, 2+ years',
+                hoursAgo: 30,
+                price: 900000,
+                category: 'Jobs',
+                place: 'Kharadi',
+                views: 611,
+                status: 'Live',
+                userId: aditi._id,
+                description: 'We are a nine-person product studio looking for a front-end developer who is comfortable owning a feature end to end. React, TypeScript and CSS you can reason about. You will work directly with the two designers, not through tickets. Hybrid — three days in the Kharadi office.'
+            },
+            {
+                title: 'Three-seater fabric sofa, teak frame',
+                hoursAgo: 50,
+                price: 18500,
+                category: 'Furniture',
+                place: 'Aundh',
+                views: 143,
+                status: 'Sold',
+                userId: rohan._id,
+                description: 'Bought eighteen months ago from a local workshop. Solid teak frame, grey fabric, no sagging and no pet damage. One cushion cover has a faint tea stain on the underside. Dimensions are 72 by 34 inches. You will need to arrange transport — it fits through a standard door with the legs off.'
+            },
+            {
+                title: 'Google Pixel 8, 128 GB, unlocked',
+                hoursAgo: 54,
+                price: 31000,
+                category: 'Phones',
+                place: 'Hinjawadi',
+                views: 268,
+                status: 'Paused',
+                userId: rohan._id,
+                description: 'Used with a case and screen protector since day one, so there are no marks on the glass or frame. Battery is healthy and it holds a full day easily. Original charger and box included. Factory reset and ready to go. Switching to a work-issued iPhone.'
+            },
+            {
+                title: 'Royal Enfield Classic 350, 2021',
+                hoursAgo: 74,
+                price: 135000,
+                category: 'Cars',
+                place: 'Wakad',
+                views: 421,
+                status: 'Live',
+                userId: aditi._id,
+                description: '12,800 km, mostly highway. Serviced at the company workshop every time, bills available. Stock exhaust kept aside if you prefer it; currently has a legal aftermarket one. New chain sprocket set and battery this year. Minor rust on one footpeg, nothing structural.'
+            },
+            {
+                title: 'Standing desk, electric, 120 × 60 cm',
+                hoursAgo: 98,
+                price: 7200,
+                category: 'Furniture',
+                place: 'Pimple Saudagar',
+                views: 96,
+                status: 'Live',
+                userId: rohan._id,
+                description: 'Two-motor electric frame with a laminate top, height memory for three positions. Lifts smoothly and holds two monitors without wobble. The top has one cable cut-out I drilled myself, cleanly finished. Selling because I am moving cities and cannot take it along.'
+            }
+        ];
+
+        // give every listing a different age, so the cards do not all say "just now"
+        const now = Date.now();
+
+        const withDates = listings.map( item =&gt;{
+            const { hoursAgo, ...rest } = item;
+            const date = new Date( now - hoursAgo * 60 * 60 * 1000 );
+            return { ...rest, createdAt: date, updatedAt: date };
+        })
+
+        // timestamps: false tells mongoose to keep our dates instead of using now
+        await Listing.insertMany(withDates, { timestamps: false });
+
+        console.log('✅ Database seeded: 2 users and 8 listings');
+        console.log('   login with rohan@gmail.com / 123456');
+
+    } catch (error) {
+        console.log('Seeding failed', error);
+    }
+
+}</code></pre></div>
+  <ul class="clean">
+    <li>It checks <code>countDocuments()</code> first, so it <b>only runs once</b>, on an empty database.</li>
+    <li>Users are created with <code>new User(...).save()</code> so the pre-save hook <b>hashes their passwords</b>. <code>insertMany</code> would skip that hook.</li>
+    <li>Listings use <code>insertMany</code> with <code>timestamps: false</code> so Mongoose keeps the fake "2 hours ago" dates.</li>
+  </ul>
+  <div class="note"><b>Re-seed from scratch</b>Delete the <code>listings</code> and <code>users</code> collections in Compass, then restart the server.</div>
+</section>
+
+<section class="step" data-step="Final server.ts">
+  <p class="lead">Call the seed after startup, and close the database connection cleanly when the process stops (Ctrl+C = <code>SIGINT</code>, and hosting platforms send <code>SIGTERM</code>).</p>
+  <div class="codeblock" data-lang="typescript" data-file="src/server.ts"><pre><code>import app from './app.ts';
+import { connectDatabase, disconnectDatabase } from './config/database.ts';
+import { config } from './config/index.ts';
+import { seedDatabase } from './seed.ts';
+
+
+const startServer = async ()=&gt;{
+
+    try {
+
+        // 1 connect to db
+        await connectDatabase();
+
+        // 2 start express server
+        app.listen(config.port, ()=&gt;{
+            console.log(`Server running on http://localhost:${config.port}`);
+        })
+
+        // 3 put the demo data in, but only the first time
+        seedDatabase();
+
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+
+}
+
+
+// GRACEFUL SHUTDOWN
+
+process.on('SIGTERM', async ()=&gt;{
+    console.log('SIGTERM received');
+    await disconnectDatabase();
+    process.exit(0);
+})
+
+process.on('SIGINT', async ()=&gt;{
+    console.log('SIGINT received');
+    await disconnectDatabase();
+    process.exit(0);
+})
+
+
+startServer();</code></pre></div>
+  <div class="ok"><b>✅ Checkpoint</b>With an empty database, restart and you should see <code>✅ Database seeded: 2 users and 8 listings</code>. Log in as <code>rohan@gmail.com</code> / <code>123456</code>.</div>
+</section>
+
+<!-- ===================================================== PHASE 6 -->
+<div class="phase" id="phase6">
+  <div class="phase-label">Phase 6</div>
+  <h2>Test everything and connect the frontend</h2>
+</div>
+
+<section class="step" data-step="Full API test run">
+  <p class="lead">Run these from <b>Git Bash</b>. In PowerShell, type <code>curl.exe</code> instead of <code>curl</code>. Or run the same requests in Postman.</p>
+  <div class="codeblock" data-lang="bash" data-file="terminal (Git Bash)"><pre><code># 1. login and copy the token from the answer
+curl -X POST http://localhost:5000/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"rohan@gmail.com","password":"123456"}'
+
+TOKEN="paste-the-token-here"
+
+# 2. public: browse, filter, search, sort
+curl "http://localhost:5000/api/listings/list"
+curl "http://localhost:5000/api/listings/list?cat=Cars&amp;sort=price_desc"
+curl "http://localhost:5000/api/listings/list?q=macbook"
+
+# 3. private: my listings
+curl http://localhost:5000/api/listings/mine -H "Authorization: Bearer $TOKEN"
+
+# 4. create with a photo (multipart form)
+curl -X POST http://localhost:5000/api/listings/create \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "title=Mountain bike, 21 gears" -F "price=9500" -F "category=Furniture" \
+  -F "place=Kothrud" -F "description=Barely used, new brakes and tyres." \
+  -F "image=@./bike.jpg"
+
+# 5. edit: mark as sold (use an id from step 3)
+curl -X PUT http://localhost:5000/api/listings/edit/LISTING_ID \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"status":"Sold"}'
+
+# 6. delete -> 204 No Content
+curl -i -X DELETE http://localhost:5000/api/listings/delete/LISTING_ID \
+  -H "Authorization: Bearer $TOKEN"</code></pre></div>
+  <h3>Also test the failure cases</h3>
+  <table>
+    <tr><th>Try this</th><th>Expected</th></tr>
+    <tr><td><code>/mine</code> without a token</td><td>401 "No token provided"</td></tr>
+    <tr><td>A token with one letter changed</td><td>401 "Invalid token"</td></tr>
+    <tr><td><code>/byid/123</code></td><td>400 "invalid params"</td></tr>
+    <tr><td><code>/byid/</code> + a valid-looking id that does not exist</td><td>404 "listing not found"</td></tr>
+    <tr><td>Create with <code>category=Boats</code></td><td>400 "invalid category"</td></tr>
+    <tr><td>Edit Aditi's listing using Rohan's token</td><td>403 "this listing is not yours"</td></tr>
+  </table>
+</section>
+
+<section class="step" data-step="Connect the React frontend">
+  <p class="lead">The frontend talks to the API through one Axios instance. It adds the token to every request automatically.</p>
+  <div class="codeblock" data-lang="typescript" data-file="frontend/src/services/api.ts"><pre><code>import axios from "axios";
+
+const api = axios.create({
+    baseURL: 'http://localhost:5000/api',
+    timeout: 10000
+})
+
+
+// before every request, add the token if the user is logged in
+api.interceptors.request.use((config)=&gt;{
+
+    const token = localStorage.getItem('token');
+
+    if(token){
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+})
+
+
+export default api;</code></pre></div>
+  <ul class="clean">
+    <li>Run the backend (<code>npm run dev</code> in <code>backend/</code>) and the frontend (<code>npm run dev</code> in <code>frontend/</code>) in <b>two terminals</b>.</li>
+    <li>To upload a photo from React, build a <code>FormData</code>, append the fields and the file under the name <b><code>image</code></b> (it must match <code>upload.single('image')</code>), then <code>api.post('/listings/create', formData)</code>.</li>
+    <li>To show a photo, use <code>'http://localhost:5000' + listing.image</code>.</li>
+  </ul>
+</section>
+
+<!-- ===================================================== PHASE 7 -->
+<div class="phase" id="phase7">
+  <div class="phase-label">Phase 7</div>
+  <h2>Going further</h2>
+</div>
+
+<section class="step" data-step="Improvements before production">
+  <p class="lead">The API works, but these are the next things a senior developer would add before putting it online. Each one makes a good exercise.</p>
+  <table>
+    <tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+    <tr><td><b>Return 500 for server errors</b></td><td>The <code>catch</code> blocks currently answer 400 even when the server is at fault, and they send the raw error object to the client.</td><td>Add a <code>sendServerError(res)</code> helper that returns 500, and log the real error with <code>console.error</code> instead of sending it.</td></tr>
+    <tr><td><b>Escape the search text</b></td><td><code>q</code> goes straight into <code>$regex</code>. Characters like <code>(</code> or <code>.*</code> can break the query or make it slow.</td><td><code>q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&amp;')</code> before using it.</td></tr>
+    <tr><td><b>Only accept images</b></td><td>Multer currently saves any file type.</td><td>Add a <code>fileFilter</code> that accepts only <code>image/jpeg</code>, <code>image/png</code> and <code>image/webp</code>.</td></tr>
+    <tr><td><b>Delete the photo with the listing</b></td><td>Deleted listings leave their image files on disk.</td><td>Call <code>fs.unlink</code> on the file in <code>deleteListing</code>.</td></tr>
+    <tr><td><b>Allow changing the photo on edit</b></td><td>The edit route accepts JSON only.</td><td>Add <code>upload.single('image')</code> to the edit route and set <code>updates.image</code> when <code>req.file</code> exists.</td></tr>
+    <tr><td><b>Stricter id check</b></td><td>The regex accepts any letter, but Mongo ids use only hexadecimal (0–9, a–f).</td><td>Use <code>/^[a-f0-9]{24}$/i</code>, or <code>mongoose.isValidObjectId(id)</code>.</td></tr>
+    <tr><td><b>Require a real JWT secret</b></td><td>If <code>.env</code> is missing, the code falls back to a public default secret.</td><td>In production, throw an error at startup when <code>JWT_SECRET</code> is not set.</td></tr>
+    <tr><td><b>Lock down CORS</b></td><td><code>cors()</code> allows every website to call the API.</td><td><code>cors({ origin: 'https://your-site.com' })</code></td></tr>
+    <tr><td><b>Pagination</b></td><td><code>/list</code> returns every listing at once.</td><td>Read <code>?page=&amp;limit=</code> and use <code>.skip()</code> and <code>.limit()</code>.</td></tr>
+    <tr><td><b>Security middleware</b></td><td>Protects against common attacks and brute-force logins.</td><td><code>helmet</code> and <code>express-rate-limit</code> on <code>/api/users/login</code>.</td></tr>
+    <tr><td><b>Cloud image storage</b></td><td>Local disk files are lost on most hosting platforms.</td><td>Upload to Cloudinary or S3 and store the URL.</td></tr>
+  </table>
+  <div class="ok"><b>🎉 Done</b>You have built a complete, typed, validated and authenticated REST API with file uploads. The same pattern (model → schema → middleware → controller → route) works for any new feature, such as favourites, messages or reviews.</div>
+</section>
+
+</main>
+</div>
+<button class="menu-btn" id="menuBtn">☰ Steps</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function(){
+  // --- theme toggle
+  var root = document.documentElement;
+  function store(k, v){ try{ if(v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); }catch(e){ return null; } }
+  var saved = store('kiosk-guide-theme');
+  if(saved) root.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').onclick = function(){
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); store('kiosk-guide-theme', next);
+  };
+
+  // --- code blocks: header bar with file name + copy button
+  document.querySelectorAll('.codeblock').forEach(function(block){
+    var code = block.querySelector('code');
+    code.className = 'language-' + (block.dataset.lang || 'plaintext');
+    var bar = document.createElement('div'); bar.className = 'bar';
+    var name = document.createElement('span'); name.textContent = block.dataset.file || '';
+    var btn = document.createElement('button'); btn.textContent = 'Copy';
+    btn.onclick = function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      });
+    };
+    bar.appendChild(name); bar.appendChild(btn); block.insertBefore(bar, block.firstChild);
+  });
+  if(window.hljs) hljs.highlightAll();
+
+  // --- number steps, build the sidebar, progress checkboxes
+  var tocLinks = document.getElementById('toc-links');
+  var done = {};
+  try{ done = JSON.parse(store('kiosk-guide-done') || '{}') || {}; }catch(e){}
+  var steps = document.querySelectorAll('section.step');
+  var phases = document.querySelectorAll('.phase');
+  var links = [];
+
+  function updateProgress(){
+    var n = steps.length, d = 0;
+    steps.forEach(function(s){ if(done[s.id]) d++; });
+    document.getElementById('bar').style.width = (d / n * 100) + '%';
+    document.getElementById('ptext').textContent = d + ' of ' + n + ' steps done';
+    links.forEach(function(a){ a.classList.toggle('done', !!done[a.dataset.id]); });
+  }
+
+  var i = 0;
+  document.querySelectorAll('.phase, section.step').forEach(function(el){
+    if(el.classList.contains('phase')){
+      var h = document.createElement('h4');
+      h.textContent = el.querySelector('.phase-label').textContent + ' · ' + el.querySelector('h2').textContent;
+      tocLinks.appendChild(h);
+      return;
+    }
+    i++;
+    el.id = 'step-' + i;
+    var head = document.createElement('div'); head.className = 'step-head';
+    head.innerHTML = '<span class="step-num">' + i + '</span><div class="title"><h2></h2></div>' +
+      '<label class="check"><input type="checkbox"> Done</label>';
+    head.querySelector('h2').textContent = el.dataset.step;
+    el.insertBefore(head, el.firstChild);
+    var cb = head.querySelector('input');
+    cb.checked = !!done[el.id];
+    cb.onchange = function(){ done[el.id] = cb.checked; store('kiosk-guide-done', JSON.stringify(done)); updateProgress(); };
+
+    var a = document.createElement('a');
+    a.href = '#' + el.id; a.dataset.id = el.id;
+    a.innerHTML = '<span class="n">' + i + '</span><span></span>';
+    a.lastChild.textContent = el.dataset.step;
+    a.onclick = function(){ document.getElementById('toc').classList.remove('open'); };
+    tocLinks.appendChild(a); links.push(a);
+  });
+  updateProgress();
+
+  document.getElementById('menuBtn').onclick = function(){ document.getElementById('toc').classList.toggle('open'); };
+})();
+</script>
+</body>
+</html>

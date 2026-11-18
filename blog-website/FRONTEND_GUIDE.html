@@ -1,0 +1,890 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Building the frontend, step by step</title>
+<style>pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #ffffcc }
+.codehilite { background: #f0f0f0; }
+.codehilite .c { color: #60A0B0; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #F00 } /* Error */
+.codehilite .k { color: #007020; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666 } /* Operator */
+.codehilite .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #007020 } /* Comment.Preproc */
+.codehilite .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F00 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888 } /* Generic.Output */
+.codehilite .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #04D } /* Generic.Traceback */
+.codehilite .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #007020 } /* Keyword.Pseudo */
+.codehilite .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #902000 } /* Keyword.Type */
+.codehilite .m { color: #40A070 } /* Literal.Number */
+.codehilite .s { color: #4070A0 } /* Literal.String */
+.codehilite .na { color: #4070A0 } /* Name.Attribute */
+.codehilite .nb { color: #007020 } /* Name.Builtin */
+.codehilite .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #60ADD5 } /* Name.Constant */
+.codehilite .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.codehilite .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #007020 } /* Name.Exception */
+.codehilite .nf { color: #06287E } /* Name.Function */
+.codehilite .nl { color: #002070; font-weight: bold } /* Name.Label */
+.codehilite .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #BB60D5 } /* Name.Variable */
+.codehilite .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #BBB } /* Text.Whitespace */
+.codehilite .mb { color: #40A070 } /* Literal.Number.Bin */
+.codehilite .mf { color: #40A070 } /* Literal.Number.Float */
+.codehilite .mh { color: #40A070 } /* Literal.Number.Hex */
+.codehilite .mi { color: #40A070 } /* Literal.Number.Integer */
+.codehilite .mo { color: #40A070 } /* Literal.Number.Oct */
+.codehilite .sa { color: #4070A0 } /* Literal.String.Affix */
+.codehilite .sb { color: #4070A0 } /* Literal.String.Backtick */
+.codehilite .sc { color: #4070A0 } /* Literal.String.Char */
+.codehilite .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #4070A0 } /* Literal.String.Double */
+.codehilite .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.codehilite .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.codehilite .sx { color: #C65D09 } /* Literal.String.Other */
+.codehilite .sr { color: #235388 } /* Literal.String.Regex */
+.codehilite .s1 { color: #4070A0 } /* Literal.String.Single */
+.codehilite .ss { color: #517918 } /* Literal.String.Symbol */
+.codehilite .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #06287E } /* Name.Function.Magic */
+.codehilite .vc { color: #BB60D5 } /* Name.Variable.Class */
+.codehilite .vg { color: #BB60D5 } /* Name.Variable.Global */
+.codehilite .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.codehilite .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.codehilite .il { color: #40A070 } /* Literal.Number.Integer.Long */
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.55; color: #1c1b2e; }
+h1 { font-size: 24pt; color: #5b3fe0; border-bottom: 3px solid #7C5CFF; padding-bottom: 6px; margin-top: 0; }
+h2 { font-size: 15pt; color: #5b3fe0; margin-top: 26px; border-bottom: 1px solid #ddd6ff; padding-bottom: 3px; break-after: avoid; }
+h2 { break-before: auto; }
+h3 { font-size: 12pt; color: #3a2a8f; margin-top: 18px; break-after: avoid; }
+p, li { orphans: 3; widows: 3; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; background: #f1eefc; padding: 1px 4px; border-radius: 3px; }
+.codehilite { background: #f7f6fc; border: 1px solid #e3def8; border-left: 3px solid #7C5CFF; border-radius: 4px; padding: 8px 12px; margin: 10px 0; break-inside: avoid; }
+.codehilite pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.codehilite code, pre code { background: none; padding: 0; font-size: 8.8pt; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.5pt; break-inside: avoid; }
+th { background: #7C5CFF; color: #fff; text-align: left; }
+th, td { border: 1px solid #ddd6ff; padding: 5px 8px; vertical-align: top; }
+tr:nth-child(even) td { background: #faf9ff; }
+blockquote { margin: 10px 0; padding: 8px 14px; background: #fff7e6; border-left: 4px solid #f5a623; }
+blockquote p { margin: 0; }
+hr { border: none; border-top: 1px dashed #ccc; margin: 20px 0; }
+strong { color: #111; }
+
+@media screen {
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #f4f2fb; }
+  .wrap { display: flex; gap: 32px; max-width: 1180px; margin: 0 auto; padding: 32px 16px; }
+  .toc { position: sticky; top: 24px; align-self: flex-start; width: 250px; flex-shrink: 0; background: #fff; border: 1px solid #e3def8; border-radius: 10px; padding: 16px 18px; max-height: calc(100vh - 48px); overflow-y: auto; font-size: 9.5pt; }
+  .toc p { margin: 0 0 8px; font-weight: 700; color: #5b3fe0; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; }
+  .toc li { margin: 5px 0; }
+  .toc a { color: #3a2a8f; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  main { flex: 1; min-width: 0; background: #fff; border: 1px solid #e3def8; border-radius: 10px; padding: 40px 48px; font-size: 11pt; }
+  h2 { scroll-margin-top: 20px; }
+  table { display: block; overflow-x: auto; }
+}
+@media screen and (max-width: 860px) {
+  .wrap { flex-direction: column; }
+  .toc { position: static; width: auto; max-height: none; }
+  main { padding: 24px 18px; }
+}
+@media print { .toc { display: none; } }
+</style></head><body><div class="wrap"><nav class="toc"><p>Contents</p><ol><li><a href="#s0">Step 0 — Check your starting point</a></li><li><a href="#s1">Step 1 — Install the packages</a></li><li><a href="#s2">Step 2 — Describe the data: <code>types/</code></a></li><li><a href="#s3">Step 3 — One axios instance: <code>services/api.ts</code></a></li><li><a href="#s4">Step 4 — The auth service: <code>services/authService.ts</code></a></li><li><a href="#s5">Step 5 — The post service: <code>services/postService.ts</code></a></li><li><a href="#s6">Step 6 — Small helpers: <code>services/helpers.ts</code></a></li><li><a href="#s7">Step 7 — Register page</a></li><li><a href="#s8">Step 8 — Login page</a></li><li><a href="#s9">Step 9 — The header knows who is logged in</a></li><li><a href="#s10">Step 10 — Home page: load the posts</a></li><li><a href="#s11">Step 11 — Articles page</a></li><li><a href="#s12">Step 12 — Article detail: read the slug from the url</a></li><li><a href="#s13">Step 13 — The Dashboard</a></li><li><a href="#s14">Step 14 — Final test, the whole story</a></li><li><a href="#s15">When something goes wrong</a></li></ol></nav><main><h1>Building the frontend, step by step</h1>
+<p>This guide starts where the template stops.</p>
+<p><strong>Where you are now:</strong> the template is integrated. The 7 pages (<code>Home</code>,
+<code>Articles</code>, <code>ArticleDetail</code>, <code>About</code>, <code>Login</code>, <code>Register</code>, <code>Dashboard</code>) show
+the right design, the Tailwind theme is in <code>index.css</code>, and the routes work.
+But every page shows <strong>fake, hard-coded content</strong>. Nothing talks to the backend.</p>
+<p><strong>Where you are going:</strong> real posts from MongoDB, real accounts, and a
+dashboard where a writer can create, edit and delete their own posts.</p>
+<p>We go from the bottom up: first the pieces that talk to the backend (types,
+services), then the pages that use them. Every step ends with a way to check
+that it works before you move on.</p>
+<blockquote>
+<p>Keep the backend running (<code>cd backend &amp;&amp; npm run dev</code>) the whole time.</p>
+</blockquote>
+<hr />
+<h2 id="s0">Step 0 — Check your starting point</h2>
+<p>Your <code>frontend/</code> should look like this:</p>
+<div class="codehilite"><pre><span></span><code>frontend/src/
+  main.tsx          &lt;BrowserRouter&gt; around &lt;App /&gt;
+  App.tsx           the 7 routes
+  index.css         the Tailwind theme
+  pages/            the 7 pages, static
+</code></pre></div>
+
+<p><code>App.tsx</code> should already have the routes. Notice <code>:slug</code> in the article route,
+we will read it later with <code>useParams</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">Routes</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">Home</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/articles"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">Articles</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/articles/:slug"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">ArticleDetail</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/about"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">About</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/login"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">Login</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/register"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">Register</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Route</span><span class="w"> </span><span class="na">path</span><span class="o">=</span><span class="s">"/dashboard"</span><span class="w"> </span><span class="na">element</span><span class="o">=</span><span class="p">{&lt;</span><span class="nt">Dashboard</span><span class="w"> </span><span class="p">/&gt;}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">Routes</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>If the template pages are still <code>.jsx</code>, rename them to <code>.tsx</code> now. TypeScript
+will tell us when we pass something wrong to a page.</p>
+<p><strong>Check:</strong> <code>npm run dev</code>, open http://localhost:5173, click every link in the
+header. Every page must show up.</p>
+<hr />
+<h2 id="s1">Step 1 — Install the packages</h2>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>frontend
+npm<span class="w"> </span>install<span class="w"> </span>axios<span class="w"> </span>react-hook-form<span class="w"> </span>zod<span class="w"> </span>@hookform/resolvers<span class="w"> </span>sweetalert2
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>axios</code></td>
+<td>calling the backend</td>
+</tr>
+<tr>
+<td><code>react-hook-form</code> + <code>zod</code> + <code>@hookform/resolvers</code></td>
+<td>the Login and Register forms</td>
+</tr>
+<tr>
+<td><code>sweetalert2</code></td>
+<td>the success / error / "are you sure?" popups</td>
+</tr>
+</tbody>
+</table>
+<p><code>react-router-dom</code> and <code>tailwindcss</code> are already there from the template.</p>
+<hr />
+<h2 id="s2">Step 2 — Describe the data: <code>types/</code></h2>
+<p>Before calling the api, write down <strong>what the api answers</strong>. Open
+<code>backend/src/models/post.models.ts</code> and copy the fields.</p>
+<p>Create <code>src/types/User.ts</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">_id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// what POST /users/login sends back</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">LoginResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="kt">User</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Create <code>src/types/Post.ts</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// The author is populated by the backend, so it comes back as an object</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">Author</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">_id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">Post</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">_id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">slug</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">readTime</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">excerpt</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">quote?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">image?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">'published'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">authorId</span><span class="o">:</span><span class="w"> </span><span class="kt">Author</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">createdAt</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">updatedAt</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Two details:</p>
+<ul>
+<li>Dates are <code>string</code>, not <code>Date</code>. JSON has no date type.</li>
+<li><code>authorId</code> is <code>Author | string</code>. The <code>list</code> and <code>byslug</code> routes call
+  <code>.populate('authorId')</code>, so you get an object. The <code>mine</code> route does not,
+  so you get just the id.</li>
+</ul>
+<hr />
+<h2 id="s3">Step 3 — One axios instance: <code>services/api.ts</code></h2>
+<p>Every request goes through this file. We set the base url once, and we add the
+token automatically.</p>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">axios</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"axios"</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">axios</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="s1">'http://localhost:4000/api'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">10000</span>
+<span class="p">})</span>
+
+<span class="c1">// before every request, add the token if the user is logged in</span>
+<span class="nx">api</span><span class="p">.</span><span class="nx">interceptors</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">use</span><span class="p">((</span><span class="nx">config</span><span class="p">)=&gt;{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">token</span><span class="p">){</span>
+<span class="w">        </span><span class="nx">config</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">Authorization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`Bearer </span><span class="si">${</span><span class="nx">token</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">config</span><span class="p">;</span>
+<span class="p">})</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">api</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The backend's <code>authenticate</code> middleware reads <code>Authorization: Bearer &lt;token&gt;</code>.
+Thanks to the interceptor, <strong>you never write that header by hand</strong>.</p>
+<hr />
+<h2 id="s4">Step 4 — The auth service: <code>services/authService.ts</code></h2>
+<p>All the backend answers look like <code>{ success, message, data }</code>, so the useful
+part is always <code>response.data.data</code>.</p>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"./api"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">User</span><span class="p">,</span><span class="w"> </span><span class="nx">LoginResponse</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../types/User"</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">authService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nx">register</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/users/register'</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nx">login</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">LoginResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/users/login'</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="o">:</span><span class="w"> </span><span class="kt">LoginResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// keep the token and the user in the browser</span>
+<span class="w">        </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nx">token</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">user</span><span class="p">));</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nx">logout</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">'user'</span><span class="p">);</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="c1">// the user saved at login, or null when nobody is logged in</span>
+<span class="w">    </span><span class="nx">getCurrentUser</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'user'</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nx">isLoggedIn</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'token'</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>localStorage</code> only stores strings. That is why we save the user with
+<code>JSON.stringify</code> and read it back with <code>JSON.parse</code>.</p>
+<hr />
+<h2 id="s5">Step 5 — The post service: <code>services/postService.ts</code></h2>
+<p>One function per backend route.</p>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"./api"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Post</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../types/Post"</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">postService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// every published post, for the public blog</span>
+<span class="w">    </span><span class="nx">getAll</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Post</span><span class="p">[]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/posts/list'</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="c1">// one post, for the article page</span>
+<span class="w">    </span><span class="nx">getBySlug</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">slug</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/posts/byslug/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">slug</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="c1">// the posts of the logged in user, drafts included</span>
+<span class="w">    </span><span class="nx">getMine</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Post</span><span class="p">[]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/posts/mine'</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="c1">// we send FormData because a post can have a cover image</span>
+<span class="w">    </span><span class="nx">create</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">FormData</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/posts/create'</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nx">update</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">FormData</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">'/posts/edit/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nx">delete</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="s1">'/posts/delete/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>create</code> and <code>update</code> take a <code>FormData</code>, not an object. An image file cannot
+go inside JSON. When axios sees a <code>FormData</code> it sets the
+<code>multipart/form-data</code> header by itself, so don't set it yourself.</p>
+<hr />
+<h2 id="s6">Step 6 — Small helpers: <code>services/helpers.ts</code></h2>
+<p>Two things every page needs:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// "2026-09-14T10:00:00.000Z"  -&gt;  "Sep 14, 2026"</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">formatDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">date</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">(</span><span class="nx">date</span><span class="p">).</span><span class="nx">toLocaleDateString</span><span class="p">(</span><span class="s1">'en-US'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">month</span><span class="o">:</span><span class="w"> </span><span class="s1">'short'</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">day</span><span class="o">:</span><span class="w"> </span><span class="s1">'numeric'</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">year</span><span class="o">:</span><span class="w"> </span><span class="s1">'numeric'</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1">// the backend gives "/uploads/posts/post-123.jpg", the browser needs the full url</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">imageUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">image?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">=&gt;{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">image</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'http://localhost:4000'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">image</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">null</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note that the image url has <strong>no <code>/api</code></strong>. <code>app.ts</code> serves <code>/uploads</code> directly.</p>
+<p><strong>Check (steps 2–6):</strong> nothing shows on screen yet, but <code>npm run build</code> must
+pass with no TypeScript errors.</p>
+<hr />
+<h2 id="s7">Step 7 — Register page</h2>
+<p>We need an account before we can test anything else, so start here.</p>
+<p>In <code>pages/Register.tsx</code>, above the component, write the form rules:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useNavigate</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"react-router-dom"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useForm</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"react-hook-form"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">zodResolver</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"@hookform/resolvers/zod"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">z</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"zod"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">Swal</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"sweetalert2"</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">authService</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../services/authService"</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">registerSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">object</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s2">"name must contain at least 2 characters"</span><span class="p">),</span>
+<span class="w">    </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">email</span><span class="p">(</span><span class="s2">"invalid email"</span><span class="p">),</span>
+<span class="w">    </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="w"> </span><span class="s2">"password must contain at least 6 characters"</span><span class="p">),</span>
+<span class="w">    </span><span class="nx">confirmPassword</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">(),</span>
+<span class="w">    </span><span class="nx">terms</span><span class="o">:</span><span class="w"> </span><span class="kt">z.literal</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s2">"you must accept the terms"</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="w">  </span><span class="c1">// the two passwords have to be the same</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">refine</span><span class="p">((</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">password</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">confirmPassword</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s2">"the two passwords are different"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"confirmPassword"</span><span class="p">],</span>
+<span class="w">  </span><span class="p">});</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">RegisterForm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">infer</span><span class="p">&lt;</span><span class="nt">typeof</span><span class="w"> </span><span class="na">registerSchema</span><span class="p">&gt;;</span>
+</code></pre></div>
+
+<p>Use the <strong>same limits as the backend</strong> (<code>backend/src/schemas/user.schema.ts</code>).
+The user sees the error right away, without a round trip to the server.</p>
+<p>Inside the component:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">navigate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useNavigate</span><span class="p">();</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">register</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">handleSubmit</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">formState</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">errors</span><span class="p">,</span><span class="w"> </span><span class="nx">isSubmitting</span><span class="w"> </span><span class="p">},</span>
+<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useForm</span><span class="p">&lt;</span><span class="nt">RegisterForm</span><span class="p">&gt;({</span><span class="w"> </span><span class="nx">resolver</span><span class="o">:</span><span class="w"> </span><span class="kt">zodResolver</span><span class="p">(</span><span class="nx">registerSchema</span><span class="p">)</span><span class="w"> </span><span class="p">});</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">onSubmit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">RegisterForm</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// the backend only needs these three</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">authService</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">data.name</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">data.email</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">data.password</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"success"</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Account created !"</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="s2">"You can sign in now."</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">navigate</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"error"</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Could not create the account"</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">error.response?.data?.error</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"Something went wrong"</span><span class="p">,</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>Then connect the template's JSX:</p>
+<ol>
+<li><code>&lt;form onSubmit={handleSubmit(onSubmit)}&gt;</code></li>
+<li>on each input, add <code>{...register("name")}</code>, <code>{...register("email")}</code>,
+   and so on. The name must match the schema.</li>
+<li>under each input, show the error:
+   <code>tsx
+   {errors.email &amp;&amp; &lt;p className="..."&gt;{errors.email.message}&lt;/p&gt;}</code></li>
+<li>on the submit button: <code>disabled={isSubmitting}</code></li>
+</ol>
+<p><strong>Check:</strong> leave everything empty and click submit. You should see the red
+messages. Then fill the form correctly. You should land on <code>/login</code>, and the
+user should be in MongoDB (check with Compass).</p>
+<hr />
+<h2 id="s8">Step 8 — Login page</h2>
+<p>Same thing, with a smaller schema:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">loginSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">object</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">email</span><span class="p">(</span><span class="s2">"invalid email"</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="w"> </span><span class="s2">"password must contain at least 6 characters"</span><span class="p">),</span>
+<span class="p">});</span>
+<span class="kr">type</span><span class="w"> </span><span class="nx">LoginForm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">infer</span><span class="p">&lt;</span><span class="nt">typeof</span><span class="w"> </span><span class="na">loginSchema</span><span class="p">&gt;;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">onSubmit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">LoginForm</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">authService</span><span class="p">.</span><span class="nx">login</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span><span class="w">   </span><span class="c1">// saves token + user in localStorage</span>
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span><span class="w"> </span><span class="nx">position</span><span class="o">:</span><span class="w"> </span><span class="s2">"top-end"</span><span class="p">,</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"success"</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Welcome back !"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">showConfirmButton</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">,</span><span class="w"> </span><span class="nx">timer</span><span class="o">:</span><span class="w"> </span><span class="kt">1500</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">navigate</span><span class="p">(</span><span class="s2">"/dashboard"</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"error"</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Could not sign in"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">error.response?.data?.error</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"Something went wrong"</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>Connect the form exactly as in step 7.</p>
+<p><strong>Check:</strong> sign in, then open DevTools → Application → Local Storage. You
+should see <code>token</code> and <code>user</code>. With a wrong password you should get the
+error popup.</p>
+<hr />
+<h2 id="s9">Step 9 — The header knows who is logged in</h2>
+<p>The template's header always shows <strong>Sign in</strong>. On the public pages (<code>Home</code>,
+<code>Articles</code>, <code>ArticleDetail</code>, <code>About</code>), read the user at the top of the
+component:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">authService</span><span class="p">.</span><span class="nx">getCurrentUser</span><span class="p">();</span>
+</code></pre></div>
+
+<p>and change the button:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">Link</span><span class="w"> </span><span class="na">to</span><span class="o">=</span><span class="p">{</span><span class="nx">user</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"/dashboard"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">"/login"</span><span class="p">}</span><span class="w"> </span><span class="na">className</span><span class="o">=</span><span class="s">"..."</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="p">{</span><span class="nx">user</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"Dashboard"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">"Sign in"</span><span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">Link</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Each page has its own header (there is no shared layout), so do this on each
+public page.</p>
+<p><strong>Check:</strong> logged in, the button says <em>Dashboard</em>. Delete <code>token</code> and <code>user</code>
+from Local Storage and refresh. It says <em>Sign in</em> again.</p>
+<hr />
+<h2 id="s10">Step 10 — Home page: load the posts</h2>
+<p>Every page that loads data uses the same 3 pieces of state and the same
+<code>useEffect</code>. Learn this pattern once and you have it for all the pages.</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">posts</span><span class="p">,</span><span class="w"> </span><span class="nx">setPosts</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">Post</span><span class="err">[]</span><span class="p">&gt;([]);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">error</span><span class="p">,</span><span class="w"> </span><span class="nx">setError</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">string</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">fetchPosts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">getAll</span><span class="p">();</span>
+<span class="w">      </span><span class="nx">setPosts</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="s2">"Failed to load the posts"</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="nx">fetchPosts</span><span class="p">();</span>
+<span class="p">},</span><span class="w"> </span><span class="p">[]);</span><span class="w">   </span><span class="c1">// [] -&gt; only once, when the page opens</span>
+
+<span class="c1">// the newest post goes in the big card, the next three go in the grid</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">featured</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">posts</span><span class="p">[</span><span class="mf">0</span><span class="p">];</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">others</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">posts</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Now replace the fake content in the JSX:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nx">loading</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="nx">Loading</span><span class="p">...&lt;/</span><span class="nt">p</span><span class="p">&gt;}</span>
+<span class="p">{</span><span class="nx">error</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;{</span><span class="nx">error</span><span class="p">}&lt;/</span><span class="nt">div</span><span class="p">&gt;}</span>
+
+<span class="p">{</span><span class="nx">featured</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Link</span><span class="w"> </span><span class="na">to</span><span class="o">=</span><span class="p">{</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">featured</span><span class="p">.</span><span class="nx">slug</span><span class="si">}</span><span class="sb">`</span><span class="p">}&gt;</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">image</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">img</span><span class="w"> </span><span class="na">src</span><span class="o">=</span><span class="p">{</span><span class="nx">imageUrl</span><span class="p">(</span><span class="nx">featured</span><span class="p">.</span><span class="nx">image</span><span class="p">)</span><span class="o">!</span><span class="p">}</span><span class="w"> </span><span class="na">alt</span><span class="o">=</span><span class="p">{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="w"> </span><span class="p">/&gt;}</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">tag</span><span class="p">}&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">title</span><span class="p">}&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">excerpt</span><span class="p">}&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;{</span><span class="nx">formatDate</span><span class="p">(</span><span class="nx">featured</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)}</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">middot</span><span class="p">;</span><span class="w"> </span><span class="p">{</span><span class="nx">featured</span><span class="p">.</span><span class="nx">readTime</span><span class="p">}</span><span class="w"> </span><span class="nx">read</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">Link</span><span class="p">&gt;</span>
+<span class="p">)}</span>
+
+<span class="p">{</span><span class="nx">others</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">post</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">Link</span><span class="w"> </span><span class="na">key</span><span class="o">=</span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">_id</span><span class="p">}</span><span class="w"> </span><span class="na">to</span><span class="o">=</span><span class="p">{</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">post</span><span class="p">.</span><span class="nx">slug</span><span class="si">}</span><span class="sb">`</span><span class="p">}&gt;</span>
+<span class="w">    </span><span class="p">{</span><span class="cm">/* same idea: one card, the fields come from `post` */</span><span class="p">}</span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">Link</span><span class="p">&gt;</span>
+<span class="p">))}</span>
+
+<span class="p">{</span><span class="o">!</span><span class="nx">loading</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">posts</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="nx">No</span><span class="w"> </span><span class="nx">posts</span><span class="w"> </span><span class="nx">yet</span><span class="p">.&lt;/</span><span class="nt">p</span><span class="p">&gt;}</span>
+</code></pre></div>
+
+<p>The method: <strong>keep one card from the template, delete the copies, wrap it in
+<code>.map()</code>, and replace each hard-coded text with <code>post.something</code>.</strong> Keep all
+the <code>className</code>s as they are.</p>
+<p>If a post has no image, show the template's gradient block instead of <code>&lt;img&gt;</code>:
+<code>{post.image ? &lt;img .../&gt; : &lt;div className="brand-gradient ..."/&gt;}</code>.</p>
+<p><strong>Check:</strong> the blog is empty for now, so you should see "No posts yet".
+We fix that at step 13. If you are impatient, create a post with Postman.</p>
+<hr />
+<h2 id="s11">Step 11 — Articles page</h2>
+<p>This is the Home page without the "featured" part: the same state, the same
+<code>useEffect</code> with <code>postService.getAll()</code>, and one <code>posts.map(...)</code> over the
+template's card.</p>
+<p><strong>Check:</strong> every published post shows up, newest first.</p>
+<hr />
+<h2 id="s12">Step 12 — Article detail: read the slug from the url</h2>
+<p>The route is <code>/articles/:slug</code>, so the slug is in the url:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">slug</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useParams</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">slug</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">post</span><span class="p">,</span><span class="w"> </span><span class="nx">setPost</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">Post</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">readNext</span><span class="p">,</span><span class="w"> </span><span class="nx">setReadNext</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">Post</span><span class="err">[]</span><span class="p">&gt;([]);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">error</span><span class="p">,</span><span class="w"> </span><span class="nx">setError</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">string</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">fetchPost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">getBySlug</span><span class="p">(</span><span class="nx">slug</span><span class="o">!</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setPost</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="w">      </span><span class="c1">// two other posts for the "Read next" section</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">getAll</span><span class="p">();</span>
+<span class="w">      </span><span class="nx">setReadNext</span><span class="p">(</span><span class="nx">all</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">slug</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">slug</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">));</span>
+
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="s2">"This post does not exist"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="nx">fetchPost</span><span class="p">();</span>
+<span class="w">  </span><span class="nb">window</span><span class="p">.</span><span class="nx">scrollTo</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">);</span><span class="w">   </span><span class="c1">// start at the top when we open another post</span>
+<span class="p">},</span><span class="w"> </span><span class="p">[</span><span class="nx">slug</span><span class="p">]);</span><span class="w">   </span><span class="c1">// run again when the slug changes (click on "Read next")</span>
+</code></pre></div>
+
+<p>Why <code>[slug]</code> and not <code>[]</code>? When you click a "Read next" link you stay on the
+same page component, only the slug changes. Without <code>slug</code> in the array the
+old post would stay on screen.</p>
+<p>The body is one long text with one paragraph per line. Split it back:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">paragraphs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">post</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">post</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">"\n"</span><span class="p">).</span><span class="nx">filter</span><span class="p">((</span><span class="nx">line</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">[];</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">lede</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">paragraphs</span><span class="p">[</span><span class="mf">0</span><span class="p">];</span><span class="w">        </span><span class="c1">// the first one is shown bigger</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">rest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">paragraphs</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
+
+<span class="c1">// populated -&gt; object ; not populated -&gt; just the id</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">authorName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">post</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"object"</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="p">.</span><span class="nx">name</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="p">;</span>
+</code></pre></div>
+
+<p>In the JSX:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nx">loading</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="nx">Loading</span><span class="p">...&lt;/</span><span class="nt">p</span><span class="p">&gt;}</span>
+<span class="p">{</span><span class="nx">error</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;{</span><span class="nx">error</span><span class="p">}&lt;/</span><span class="nt">h1</span><span class="p">&gt;}</span>
+
+<span class="p">{</span><span class="nx">post</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;{</span><span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">}&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;{</span><span class="nx">authorName</span><span class="p">}</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">middot</span><span class="p">;</span><span class="w"> </span><span class="p">{</span><span class="nx">formatDate</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)}&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">image</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">img</span><span class="w"> </span><span class="na">src</span><span class="o">=</span><span class="p">{</span><span class="nx">imageUrl</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">image</span><span class="p">)</span><span class="o">!</span><span class="p">}</span><span class="w"> </span><span class="na">alt</span><span class="o">=</span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="w"> </span><span class="p">/&gt;}</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">p</span><span class="w"> </span><span class="na">className</span><span class="o">=</span><span class="s">"text-[22px] ..."</span><span class="p">&gt;{</span><span class="nx">lede</span><span class="p">}&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">rest</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">paragraph</span><span class="p">,</span><span class="w"> </span><span class="nx">index</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">p</span><span class="w"> </span><span class="na">key</span><span class="o">=</span><span class="p">{</span><span class="nx">index</span><span class="p">}&gt;{</span><span class="nx">paragraph</span><span class="p">}&lt;/</span><span class="nt">p</span><span class="p">&gt;)}</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">quote</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">blockquote</span><span class="p">&gt;{</span><span class="nx">post</span><span class="p">.</span><span class="nx">quote</span><span class="p">}&lt;/</span><span class="nt">blockquote</span><span class="p">&gt;}</span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+<span class="p">)}</span>
+</code></pre></div>
+
+<p><strong>Check:</strong> click a card on Home. The right post opens, and the url shows its
+slug. Type a slug that does not exist in the url. You should see "This post
+does not exist".</p>
+<hr />
+<h2 id="s13">Step 13 — The Dashboard</h2>
+<p>This is the biggest page. Build it in 6 small steps and test after each one.</p>
+<h3>13.1 Protect the page and load <em>your</em> posts</h3>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">navigate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useNavigate</span><span class="p">();</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">authService</span><span class="p">.</span><span class="nx">getCurrentUser</span><span class="p">();</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">posts</span><span class="p">,</span><span class="w"> </span><span class="nx">setPosts</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">Post</span><span class="err">[]</span><span class="p">&gt;([]);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">error</span><span class="p">,</span><span class="w"> </span><span class="nx">setError</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">string</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// you cannot open the dashboard without being logged in</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">authService</span><span class="p">.</span><span class="nx">isLoggedIn</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">navigate</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">fetchPosts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">getMine</span><span class="p">();</span><span class="w">   </span><span class="c1">// drafts included</span>
+<span class="w">      </span><span class="nx">setPosts</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="s2">"Failed to load your posts"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="nx">fetchPosts</span><span class="p">();</span>
+<span class="p">},</span><span class="w"> </span><span class="p">[</span><span class="nx">navigate</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>In the header, show the user's initial and a sign out button:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;{</span><span class="nx">user</span><span class="o">?</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mf">0</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()}&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">button</span><span class="w"> </span><span class="na">type</span><span class="o">=</span><span class="s">"button"</span><span class="w"> </span><span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">handleSignOut</span><span class="p">}&gt;</span><span class="nx">Sign</span><span class="w"> </span><span class="nx">out</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">handleSignOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">authService</span><span class="p">.</span><span class="nx">logout</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">navigate</span><span class="p">(</span><span class="s2">"/"</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p><strong>Check:</strong> logged out, <code>/dashboard</code> sends you to <code>/login</code>. Logged in, you
+see your initial and an empty list.</p>
+<h3>13.2 The stats</h3>
+<p>Don't call the api for these. Count the posts you already have:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">publishedCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">posts</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"published"</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">draftCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">posts</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+<span class="c1">// total = posts.length</span>
+</code></pre></div>
+
+<h3>13.3 The form state</h3>
+<p>This form has a file input and two submit buttons (<em>Save draft</em> /
+<em>Publish</em>), so we use plain <code>useState</code> here, not react-hook-form:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">setTitle</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">slug</span><span class="p">,</span><span class="w"> </span><span class="nx">setSlug</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">tag</span><span class="p">,</span><span class="w"> </span><span class="nx">setTag</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">readTime</span><span class="p">,</span><span class="w"> </span><span class="nx">setReadTime</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">excerpt</span><span class="p">,</span><span class="w"> </span><span class="nx">setExcerpt</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">body</span><span class="p">,</span><span class="w"> </span><span class="nx">setBody</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">quote</span><span class="p">,</span><span class="w"> </span><span class="nx">setQuote</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">image</span><span class="p">,</span><span class="w"> </span><span class="nx">setImage</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">File</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="c1">// when it is not null we are editing this post instead of creating a new one</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">editingId</span><span class="p">,</span><span class="w"> </span><span class="nx">setEditingId</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">&lt;</span><span class="nt">string</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="na">null</span><span class="p">&gt;(</span><span class="kc">null</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Make every input <strong>controlled</strong>:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">input</span><span class="w"> </span><span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">title</span><span class="p">}</span><span class="w"> </span><span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">setTitle</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span><span class="w"> </span><span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">textarea</span><span class="w"> </span><span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">body</span><span class="p">}</span><span class="w"> </span><span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">setBody</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span><span class="w"> </span><span class="p">/&gt;</span>
+</code></pre></div>
+
+<p>The file input is different. It has no <code>value</code>. You read the file from
+<code>e.target.files</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">input</span>
+<span class="w">  </span><span class="na">type</span><span class="o">=</span><span class="s">"file"</span>
+<span class="w">  </span><span class="na">accept</span><span class="o">=</span><span class="s">"image/*"</span>
+<span class="w">  </span><span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">setImage</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">!</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">)}</span>
+<span class="p">/&gt;</span>
+</code></pre></div>
+
+<h3>13.4 Create a post (with FormData)</h3>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">buildFormData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s2">"published"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">FormData</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"slug"</span><span class="p">,</span><span class="w"> </span><span class="nx">slug</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"tag"</span><span class="p">,</span><span class="w"> </span><span class="nx">tag</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"Notes"</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"readTime"</span><span class="p">,</span><span class="w"> </span><span class="nx">readTime</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"5 min"</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"excerpt"</span><span class="p">,</span><span class="w"> </span><span class="nx">excerpt</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"body"</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"quote"</span><span class="p">,</span><span class="w"> </span><span class="nx">quote</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span><span class="w"> </span><span class="nx">status</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">image</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">data</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"image"</span><span class="p">,</span><span class="w"> </span><span class="nx">image</span><span class="p">);</span><span class="w">   </span><span class="c1">// "image" = the name in upload.single('image')</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">data</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">resetForm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">setTitle</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setSlug</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setTag</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setReadTime</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setExcerpt</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setBody</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setQuote</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span><span class="w"> </span><span class="nx">setImage</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setEditingId</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">handleSave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s2">"published"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">buildFormData</span><span class="p">(</span><span class="nx">status</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">editingId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">editingId</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setPosts</span><span class="p">((</span><span class="nx">prev</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">prev</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">_id</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">editingId</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">updated</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">p</span><span class="p">)));</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setPosts</span><span class="p">((</span><span class="nx">prev</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="nx">created</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">prev</span><span class="p">]);</span><span class="w">   </span><span class="c1">// newest on top</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span><span class="w"> </span><span class="nx">position</span><span class="o">:</span><span class="w"> </span><span class="s2">"top-end"</span><span class="p">,</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"success"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="kt">editingId</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"Post updated"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">"Post saved"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">showConfirmButton</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">,</span><span class="w"> </span><span class="nx">timer</span><span class="o">:</span><span class="w"> </span><span class="kt">1500</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">resetForm</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"error"</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Could not save the post"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">err.response?.data?.error</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"Something went wrong"</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>The two buttons must be <code>type="button"</code>, otherwise the browser submits the
+form and reloads the page:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">button</span><span class="w"> </span><span class="na">type</span><span class="o">=</span><span class="s">"button"</span><span class="w"> </span><span class="na">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">handleSave</span><span class="p">(</span><span class="s2">"draft"</span><span class="p">)}&gt;</span><span class="nx">Save</span><span class="w"> </span><span class="nx">draft</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">button</span><span class="w"> </span><span class="na">type</span><span class="o">=</span><span class="s">"button"</span><span class="w"> </span><span class="na">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">handleSave</span><span class="p">(</span><span class="s2">"published"</span><span class="p">)}&gt;</span><span class="nx">Publish</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>We update <code>posts</code> with the answer of the api, <strong>without fetching again</strong>.
+That is the same trick as in the notes manager.</p>
+<p><strong>Check:</strong> publish a post with an image. It appears in the list, the image is
+in <code>backend/uploads/posts/</code>, and the post shows on Home and Articles. Save a
+draft. It shows in the dashboard but <strong>not</strong> on Home.</p>
+<h3>13.5 Edit a post</h3>
+<p>Clicking <em>Edit</em> fills the form and remembers the id:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">handleEdit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">post</span><span class="o">:</span><span class="w"> </span><span class="kt">Post</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">setTitle</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setSlug</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">slug</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setTag</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">tag</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setReadTime</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">readTime</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setExcerpt</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">excerpt</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setBody</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setQuote</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">quote</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">""</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">setImage</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span><span class="w">             </span><span class="c1">// keep the old image unless a new one is picked</span>
+<span class="w">  </span><span class="nx">setEditingId</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">_id</span><span class="p">);</span>
+<span class="w">  </span><span class="nb">window</span><span class="p">.</span><span class="nx">scrollTo</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p><code>handleSave</code> already knows what to do when <code>editingId</code> is set. Add a
+<em>Cancel</em> button (<code>onClick={resetForm}</code>) that only shows while editing:
+<code>{editingId &amp;&amp; &lt;button ...&gt;Cancel&lt;/button&gt;}</code>.</p>
+<h3>13.6 Delete a post</h3>
+<p>Always ask before deleting:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">handleDelete</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">Swal</span><span class="p">.</span><span class="nx">fire</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Are you sure?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="s2">"You won't be able to revert this!"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s2">"warning"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">showCancelButton</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">confirmButtonColor</span><span class="o">:</span><span class="w"> </span><span class="s2">"#7C5CFF"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">cancelButtonColor</span><span class="o">:</span><span class="w"> </span><span class="s2">"#EC4899"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">confirmButtonText</span><span class="o">:</span><span class="w"> </span><span class="s2">"Yes, delete it!"</span><span class="p">,</span>
+<span class="w">  </span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">result</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">isConfirmed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nx">postService</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">setPosts</span><span class="p">((</span><span class="nx">prev</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">prev</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">_id</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">id</span><span class="p">));</span>
+<span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">setError</span><span class="p">(</span><span class="s2">"Failed to delete the post"</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>And the list of posts:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nx">posts</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">post</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="p">&lt;</span><span class="nt">div</span><span class="w"> </span><span class="na">key</span><span class="o">=</span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">_id</span><span class="p">}&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;{</span><span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">}&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;{</span><span class="nx">post</span><span class="p">.</span><span class="nx">status</span><span class="p">}&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;{</span><span class="nx">formatDate</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)}</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">middot</span><span class="p">;</span><span class="w"> </span><span class="p">{</span><span class="nx">post</span><span class="p">.</span><span class="nx">readTime</span><span class="p">}</span><span class="w"> </span><span class="nx">read</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">button</span><span class="w"> </span><span class="na">type</span><span class="o">=</span><span class="s">"button"</span><span class="w"> </span><span class="na">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">handleEdit</span><span class="p">(</span><span class="nx">post</span><span class="p">)}&gt;</span><span class="nx">Edit</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">&lt;</span><span class="nt">button</span><span class="w"> </span><span class="na">type</span><span class="o">=</span><span class="s">"button"</span><span class="w"> </span><span class="na">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">handleDelete</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">_id</span><span class="p">)}&gt;</span><span class="nx">Delete</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">))}</span>
+</code></pre></div>
+
+<p><strong>Check:</strong> edit the title of a post and save. The new title shows everywhere.
+The url does not change, because the form sends the old slug back. Delete a
+post and it disappears from the list and from Home.</p>
+<hr />
+<h2 id="s14">Step 14 — Final test, the whole story</h2>
+<p>Do this once, from the start, as a new visitor would:</p>
+<ol>
+<li>Log out. Home shows the published posts, and the header says <em>Sign in</em>.</li>
+<li>Register a second account, then sign in with it.</li>
+<li>The dashboard is empty. You only see <strong>your</strong> posts.</li>
+<li>Publish one post and save one draft. Only the published one is on Home.</li>
+<li>Open the published post: lede, paragraphs, quote, image, "Read next".</li>
+<li>Edit it, then delete it.</li>
+<li>Sign out. Go to <code>/dashboard</code> by hand and you are sent back to <code>/login</code>.</li>
+<li><code>npm run build</code>: no errors.</li>
+</ol>
+<hr />
+<h2 id="s15">When something goes wrong</h2>
+<table>
+<thead>
+<tr>
+<th>What you see</th>
+<th>Why it happens</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Network Error</code> in the console</td>
+<td>backend not running, or wrong port</td>
+<td>start the backend; check <code>baseURL</code> in <code>api.ts</code></td>
+</tr>
+<tr>
+<td>CORS error</td>
+<td><code>app.use(cors())</code> missing</td>
+<td>it is in <code>backend/src/app.ts</code>, don't remove it</td>
+</tr>
+<tr>
+<td><code>401 No token provided</code></td>
+<td>not logged in, or the interceptor is missing</td>
+<td>sign in again; check <code>api.ts</code></td>
+</tr>
+<tr>
+<td><code>403</code> on edit/delete</td>
+<td>the post belongs to another user</td>
+<td>normal: that is the backend protecting it</td>
+</tr>
+<tr>
+<td>image does not show</td>
+<td>the url is missing the host, or has <code>/api</code></td>
+<td>use <code>imageUrl(post.image)</code></td>
+</tr>
+<tr>
+<td><code>req.body</code> is empty on create</td>
+<td>you set <code>Content-Type</code> yourself</td>
+<td>let axios set it for <code>FormData</code></td>
+</tr>
+<tr>
+<td><code>400</code> with a zod message</td>
+<td>a field breaks a backend rule (excerpt &lt; 10 chars, body &lt; 20…)</td>
+<td>read <code>err.response.data</code>; match the limits in <code>post.schema.ts</code></td>
+</tr>
+<tr>
+<td>article page shows the old post</td>
+<td><code>useEffect</code> has <code>[]</code> instead of <code>[slug]</code></td>
+<td>add <code>slug</code> to the array</td>
+</tr>
+<tr>
+<td>the page reloads on <em>Save</em></td>
+<td>the button is <code>type="submit"</code> by default</td>
+<td>use <code>type="button"</code></td>
+</tr>
+</tbody>
+</table></main></div></body></html>
